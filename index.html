@@ -46,6 +46,7 @@
   .auth-card h2{margin-bottom:var(--s-2);}
   .auth-card p{color:var(--c-ink-soft);font-size:15px;margin:0 0 var(--s-4);}
   .auth-input{width:100%;padding:14px;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:var(--c-bg);color:var(--c-ink);outline:none;margin-bottom:var(--s-3);box-sizing:border-box;}
+  .date-input{display:block;width:100%;max-width:100%;padding:12px;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:var(--c-bg-card);color:var(--c-ink);outline:none;box-sizing:border-box;font-size:16px;font-family:inherit;-webkit-appearance:none;appearance:none;}
   .auth-input:focus{border-color:var(--c-leaf);}
   .auth-btn{width:100%;padding:14px;border-radius:var(--r-md);border:none;background:var(--c-leaf);color:white;font-weight:600;font-size:16px;cursor:pointer;}
   .auth-btn:active{transform:scale(0.98);}
@@ -1042,7 +1043,7 @@ function openTagebuchForm(pflanzeId, pflanzenName, eintrag){
     fotoUrl:isEdit?eintrag.fotoUrl:null
   };
 
-  var datumInput=el("input",{"class":"","style":"width:100%;padding:12px;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:var(--c-bg-card);color:var(--c-ink);outline:none;box-sizing:border-box;",type:"date",value:draft.datum});
+  var datumInput=el("input",{"class":"date-input",type:"date",value:draft.datum});
   datumInput.addEventListener("change",function(e){draft.datum=e.target.value;});
 
   var textArea=el("textarea",{style:"width:100%;padding:12px;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:var(--c-bg-card);color:var(--c-ink);outline:none;min-height:100px;resize:vertical;margin-top:var(--s-2);font-size:16px",placeholder:"Was hast du heute im Garten gemacht?"});
@@ -1269,7 +1270,8 @@ function legendeErstellen(numMap) {
     var bp = state.beetpositionen[i];
     var pfl = null;
     for (var j = 0; j < state.pflanzen.length; j++) if (state.pflanzen[j].id === bp.pflanzeId) { pfl = state.pflanzen[j]; break; }
-    var name = pfl ? pfl.name : "Unbekannt";
+    if (!pfl) continue; // Beetposition ohne gültige Pflanze überspringen
+    var name = pfl.name;
     if (!map[bp.pflanzeId]) map[bp.pflanzeId] = { name: name, nummern: [] };
     map[bp.pflanzeId].nummern.push(numMap[bp.id]);
   }
@@ -1299,33 +1301,44 @@ function beetSVG(svgW, moving, onTap, onMarkerLongpress, filterPflanzeId) {
   function relToSvg(rx, ry) { return { x: Math.round(rx * svgW), y: Math.round(ry * svgH) }; }
   function svgToRel(sx, sy) { return { rx: sx / svgW, ry: sy / svgH }; }
 
-  // L-Form: gefülltes Polygon + einzelner Pfad für die Außenlinie
-  // Polygon für die Füllung (kein stroke)
-  var fillPts = [
+  // L-Form mit SVG clipPath - sauberste Lösung ohne Innenlinien
+  // Schritt 1: clipPath definieren (L-Form)
+  var clipId = "beet-clip-"+Math.floor(Math.random()*99999);
+  var defs = document.createElementNS(svgNS, "defs");
+  var cp = document.createElementNS(svgNS, "clipPath");
+  cp.setAttribute("id", clipId);
+  var cpPts = [
     relToSvg(0,0), relToSvg(1,0), relToSvg(1,BEET_LANG_H),
     relToSvg(BEET_KURZ_W,BEET_LANG_H), relToSvg(BEET_KURZ_W,1), relToSvg(0,1)
   ];
-  var fillPoly = document.createElementNS(svgNS, "polygon");
-  fillPoly.setAttribute("points", fillPts.map(function(p){return p.x+","+p.y;}).join(" "));
-  fillPoly.setAttribute("fill", "#e8f0e8");
-  fillPoly.setAttribute("stroke", "none");
-  svg.appendChild(fillPoly);
+  var cpPoly = document.createElementNS(svgNS, "polygon");
+  cpPoly.setAttribute("points", cpPts.map(function(p){return p.x+","+p.y;}).join(" "));
+  cp.appendChild(cpPoly);
+  defs.appendChild(cp);
+  svg.appendChild(defs);
 
-  // Einzelner Pfad für die Außenlinie (nur die Außenkante, keine Innenkante)
-  var lp = fillPts;
-  var d = "M"+lp[0].x+","+lp[0].y
-        + " L"+lp[1].x+","+lp[1].y
-        + " L"+lp[2].x+","+lp[2].y
-        + " L"+lp[3].x+","+lp[3].y
-        + " L"+lp[4].x+","+lp[4].y
-        + " L"+lp[5].x+","+lp[5].y
-        + " Z";
+  // Schritt 2: Hintergrund-Rechteck mit clipPath = nur L-Form wird gefüllt
+  var bg = document.createElementNS(svgNS, "rect");
+  bg.setAttribute("x","0"); bg.setAttribute("y","0");
+  bg.setAttribute("width", svgW); bg.setAttribute("height", svgH);
+  bg.setAttribute("fill","#e8f0e8");
+  bg.setAttribute("clip-path","url(#"+clipId+")");
+  svg.appendChild(bg);
+
+  // Schritt 3: Außenlinie als einzelner geschlossener Pfad
+  var lp2 = cpPts;
+  var pathD = "M"+lp2[0].x+","+lp2[0].y
+    +" L"+lp2[1].x+","+lp2[1].y
+    +" L"+lp2[2].x+","+lp2[2].y
+    +" L"+lp2[3].x+","+lp2[3].y
+    +" L"+lp2[4].x+","+lp2[4].y
+    +" L"+lp2[5].x+","+lp2[5].y+" Z";
   var outline = document.createElementNS(svgNS, "path");
-  outline.setAttribute("d", d);
-  outline.setAttribute("fill", "none");
-  outline.setAttribute("stroke", "#3d5a3d");
-  outline.setAttribute("stroke-width", "1.5");
-  outline.setAttribute("stroke-linejoin", "miter");
+  outline.setAttribute("d", pathD);
+  outline.setAttribute("fill","none");
+  outline.setAttribute("stroke","#3d5a3d");
+  outline.setAttribute("stroke-width","1.5");
+  outline.setAttribute("stroke-linejoin","round");
   svg.appendChild(outline);
 
   // Tap auf Karte
