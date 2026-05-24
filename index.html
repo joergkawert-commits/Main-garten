@@ -180,7 +180,7 @@
 
   /* Modal */
   .modal-scrim{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(31,36,29,0.55);display:flex;align-items:flex-end;justify-content:center;z-index:60;}
-  .modal{background:var(--c-bg-card);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:var(--s-5) var(--s-4) calc(var(--s-4) + var(--safe-bottom));box-shadow:var(--shadow-lg);}
+  .modal{background:var(--c-bg-card);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:var(--s-5) var(--s-4) calc(var(--s-4) + var(--safe-bottom));box-shadow:var(--shadow-lg);overflow:hidden;}
   .modal h2{margin-bottom:var(--s-2);}
   .modal p{color:var(--c-ink-soft);margin:0 0 var(--s-4);}
   .modal__actions{display:flex;gap:var(--s-3);}
@@ -1042,7 +1042,7 @@ function openTagebuchForm(pflanzeId, pflanzenName, eintrag){
     fotoUrl:isEdit?eintrag.fotoUrl:null
   };
 
-  var datumInput=el("input",{"class":"auth-input",type:"date",value:draft.datum,style:"margin-bottom:0;width:100%;box-sizing:border-box;"});
+  var datumInput=el("input",{"class":"","style":"width:100%;padding:12px;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:var(--c-bg-card);color:var(--c-ink);outline:none;box-sizing:border-box;",type:"date",value:draft.datum});
   datumInput.addEventListener("change",function(e){draft.datum=e.target.value;});
 
   var textArea=el("textarea",{style:"width:100%;padding:12px;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:var(--c-bg-card);color:var(--c-ink);outline:none;min-height:100px;resize:vertical;margin-top:var(--s-2);font-size:16px",placeholder:"Was hast du heute im Garten gemacht?"});
@@ -1299,51 +1299,34 @@ function beetSVG(svgW, moving, onTap, onMarkerLongpress, filterPflanzeId) {
   function relToSvg(rx, ry) { return { x: Math.round(rx * svgW), y: Math.round(ry * svgH) }; }
   function svgToRel(sx, sy) { return { rx: sx / svgW, ry: sy / svgH }; }
 
-  // L-Form: zwei Rechtecke, kurzer Schenkel überlappt langen um 1px
-  // damit keine Doppellinie an der Verbindungsstelle entsteht
-  var p1a = relToSvg(0, 0);
-  var p1b = relToSvg(1, BEET_LANG_H + 1/svgH); // 1px Überlappung nach unten
-  var r1 = document.createElementNS(svgNS, "rect");
-  r1.setAttribute("x", p1a.x); r1.setAttribute("y", p1a.y);
-  r1.setAttribute("width", p1b.x - p1a.x);
-  r1.setAttribute("height", p1b.y - p1a.y);
-  r1.setAttribute("fill", "#e8f0e8");
-  r1.setAttribute("stroke", "#3d5a3d");
-  r1.setAttribute("stroke-width", "1.5");
-  svg.appendChild(r1);
+  // L-Form: gefülltes Polygon + einzelner Pfad für die Außenlinie
+  // Polygon für die Füllung (kein stroke)
+  var fillPts = [
+    relToSvg(0,0), relToSvg(1,0), relToSvg(1,BEET_LANG_H),
+    relToSvg(BEET_KURZ_W,BEET_LANG_H), relToSvg(BEET_KURZ_W,1), relToSvg(0,1)
+  ];
+  var fillPoly = document.createElementNS(svgNS, "polygon");
+  fillPoly.setAttribute("points", fillPts.map(function(p){return p.x+","+p.y;}).join(" "));
+  fillPoly.setAttribute("fill", "#e8f0e8");
+  fillPoly.setAttribute("stroke", "none");
+  svg.appendChild(fillPoly);
 
-  var p2a = relToSvg(0, BEET_LANG_H);
-  var p2b = relToSvg(BEET_KURZ_W, 1);
-  var r2 = document.createElementNS(svgNS, "rect");
-  r2.setAttribute("x", p2a.x); r2.setAttribute("y", p2a.y);
-  r2.setAttribute("width", p2b.x - p2a.x);
-  r2.setAttribute("height", p2b.y - p2a.y);
-  r2.setAttribute("fill", "#e8f0e8");
-  r2.setAttribute("stroke", "#3d5a3d");
-  r2.setAttribute("stroke-width", "1.5");
-  // Innenkante (oben) und linke Kante (bereits durch r1 gezeichnet) ausblenden
-  // durch clipPath der die innere Kante verdeckt
-  svg.appendChild(r2);
-
-  // Deckweisse Linie über die Innenkante (horizontal, zwischen den Schenkeln)
-  var iLine = document.createElementNS(svgNS, "line");
-  var ip1 = relToSvg(BEET_KURZ_W, BEET_LANG_H);
-  var ip2 = relToSvg(1, BEET_LANG_H);
-  iLine.setAttribute("x1", ip1.x + 1); iLine.setAttribute("y1", ip1.y);
-  iLine.setAttribute("x2", ip2.x); iLine.setAttribute("y2", ip2.y);
-  iLine.setAttribute("stroke", "#e8f0e8");
-  iLine.setAttribute("stroke-width", "2");
-  svg.appendChild(iLine);
-
-  // Deckweisse Linie über die Innenkante (vertikal, rechts vom kurzen Schenkel)
-  var iLine2 = document.createElementNS(svgNS, "line");
-  var ip3 = relToSvg(BEET_KURZ_W, BEET_LANG_H);
-  var ip4 = relToSvg(BEET_KURZ_W, 1);
-  iLine2.setAttribute("x1", ip3.x); iLine2.setAttribute("y1", ip3.y + 1);
-  iLine2.setAttribute("x2", ip4.x); iLine2.setAttribute("y2", ip4.y);
-  iLine2.setAttribute("stroke", "#e8f0e8");
-  iLine2.setAttribute("stroke-width", "2");
-  svg.appendChild(iLine2);
+  // Einzelner Pfad für die Außenlinie (nur die Außenkante, keine Innenkante)
+  var lp = fillPts;
+  var d = "M"+lp[0].x+","+lp[0].y
+        + " L"+lp[1].x+","+lp[1].y
+        + " L"+lp[2].x+","+lp[2].y
+        + " L"+lp[3].x+","+lp[3].y
+        + " L"+lp[4].x+","+lp[4].y
+        + " L"+lp[5].x+","+lp[5].y
+        + " Z";
+  var outline = document.createElementNS(svgNS, "path");
+  outline.setAttribute("d", d);
+  outline.setAttribute("fill", "none");
+  outline.setAttribute("stroke", "#3d5a3d");
+  outline.setAttribute("stroke-width", "1.5");
+  outline.setAttribute("stroke-linejoin", "miter");
+  svg.appendChild(outline);
 
   // Tap auf Karte
   var tapTimer = null;
