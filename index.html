@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Mein Garten" />
-<link rel="manifest" href="/manifest.json" />
-<link rel="apple-touch-icon" href="/icon-192.png" />
+<link rel="manifest" href="/Main-garten/manifest.json" />
+<link rel="apple-touch-icon" href="/Main-garten/icon-192.png" />
 <title>Mein Garten</title>
 
 <style>
@@ -617,6 +617,18 @@ statusLog("2/4 Warte auf Auth...");
 onAuthStateChanged(auth,function(user){
   if(user){
     statusLog("3/4 User: "+user.email);
+    // Zugriffskontrolle: nur autorisierte E-Mail
+    var ERLAUBTE_EMAIL = "joerg.kawert@icloud.com";
+    if ((user.email||"").toLowerCase() !== ERLAUBTE_EMAIL.toLowerCase()) {
+      signOut(auth);
+      var content = document.getElementById("authContent");
+      if (content) {
+        clear(content);
+        content.appendChild(el("h2", null, "Kein Zugriff"));
+        content.appendChild(el("p", null, "Diese App ist privat. Du bist nicht berechtigt sie zu nutzen."));
+      }
+      return;
+    }
     state.user=user;
     state.wizardDone=true;
     var email=user.email||"";
@@ -1577,7 +1589,7 @@ function renderPlaceholder(titel,hinweis){var v=document.getElementById("view");
 // Service Worker registrieren
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function() {
-    navigator.serviceWorker.register("/sw.js")
+    navigator.serviceWorker.register("/Main-garten/sw.js")
       .then(function(reg) { console.log("SW registriert:", reg.scope); })
       .catch(function(err) { console.log("SW Fehler:", err); });
   });

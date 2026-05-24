@@ -5,9 +5,9 @@ var CACHE_NAME = "gartenapp-cache-v1";
 
 // Dateien die gecacht werden (App-Shell)
 var APP_SHELL = [
-  "/",
-  "/index.html",
-  "/manifest.json"
+  "/Main-garten/",
+  "/Main-garten/index.html",
+  "/Main-garten/manifest.json"
 ];
 
 // URLs die NICHT gecacht werden (immer Network)
