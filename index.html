@@ -45,7 +45,7 @@
   .auth-tagline{font-size:14px;color:var(--c-ink-mute);margin-bottom:var(--s-6);}
   .auth-card h2{margin-bottom:var(--s-2);}
   .auth-card p{color:var(--c-ink-soft);font-size:15px;margin:0 0 var(--s-4);}
-  .auth-input{width:100%;padding:14px;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:var(--c-bg);color:var(--c-ink);outline:none;margin-bottom:var(--s-3);}
+  .auth-input{width:100%;padding:14px;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:var(--c-bg);color:var(--c-ink);outline:none;margin-bottom:var(--s-3);box-sizing:border-box;}
   .auth-input:focus{border-color:var(--c-leaf);}
   .auth-btn{width:100%;padding:14px;border-radius:var(--r-md);border:none;background:var(--c-leaf);color:white;font-weight:600;font-size:16px;cursor:pointer;}
   .auth-btn:active{transform:scale(0.98);}
@@ -653,11 +653,11 @@ onAuthStateChanged(auth,function(user){
 // ROUTING
 // ================================================================
 var NAV_ITEMS=[
-  {hash:"#/",label:"Startseite",icon:"H"},
-  {hash:"#/pflanzen",label:"Pflanzen",icon:"P"},
-  {hash:"#/beetkarte",label:"Beetkarte",icon:"B"},
-  {hash:"#/tagebuch",label:"Tagebuch",icon:"T"},
-  {hash:"#/einstellungen",label:"Einstellungen",icon:"E"}
+  {hash:"#/",label:"Startseite"},
+  {hash:"#/pflanzen",label:"Pflanzen"},
+  {hash:"#/beetkarte",label:"Beetkarte"},
+  {hash:"#/tagebuch",label:"Tagebuch"},
+  {hash:"#/einstellungen",label:"Einstellungen"}
 ];
 
 function route(){
@@ -703,10 +703,10 @@ function buildDrawer(){
   var nav=document.getElementById("drawerNav");clear(nav);
   for(var i=0;i<NAV_ITEMS.length;i++){
     var item=NAV_ITEMS[i];
-    nav.appendChild(el("a",{"class":"drawer__item",href:item.hash,"data-hash":item.hash.replace("#","")},[el("span",{"class":"ico"},item.icon),el("span",null,item.label)]));
+    nav.appendChild(el("a",{"class":"drawer__item",href:item.hash,"data-hash":item.hash.replace("#","")},[el("span",null,item.label)]));
   }
   nav.appendChild(el("div",{style:"height:1px;background:var(--c-line);margin:8px 0"}));
-  var logoutBtn=el("button",{"class":"drawer__item drawer__item--danger"},[el("span",{"class":"ico"},"X"),el("span",null,"Abmelden")]);
+  var logoutBtn=el("button",{"class":"drawer__item drawer__item--danger"},[el("span",null,"Abmelden")]);
   logoutBtn.addEventListener("click",function(){
     confirmModal({title:"Abmelden?",text:"Du wirst ausgeloggt.",confirmLabel:"Abmelden",danger:true,onConfirm:function(){signOut(auth).then(function(){state.user=null;state.pflanzen=[];state.tagebuch=[];state.wizardDone=false;});}});
   });
@@ -1042,7 +1042,7 @@ function openTagebuchForm(pflanzeId, pflanzenName, eintrag){
     fotoUrl:isEdit?eintrag.fotoUrl:null
   };
 
-  var datumInput=el("input",{"class":"auth-input",type:"date",value:draft.datum,style:"margin-bottom:0"});
+  var datumInput=el("input",{"class":"auth-input",type:"date",value:draft.datum,style:"margin-bottom:0;width:100%;box-sizing:border-box;"});
   datumInput.addEventListener("change",function(e){draft.datum=e.target.value;});
 
   var textArea=el("textarea",{style:"width:100%;padding:12px;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:var(--c-bg-card);color:var(--c-ink);outline:none;min-height:100px;resize:vertical;margin-top:var(--s-2);font-size:16px",placeholder:"Was hast du heute im Garten gemacht?"});
@@ -1055,8 +1055,7 @@ function openTagebuchForm(pflanzeId, pflanzenName, eintrag){
     zuordnungDiv=el("div",{style:"font-size:13px;color:var(--c-ink-mute);margin-bottom:var(--s-2)"},"Pflanze: "+draft.pflanzenName+(isEdit?" (nicht aenderbar)":""));
   }
 
-  // Foto: Platzhalter – Upload kommt in Schritt 5
-  var fotoHint=el("div",{style:"font-size:12px;color:var(--c-ink-mute);margin-top:var(--s-2)"},"Foto-Upload folgt in Schritt 5.");
+
 
   var saveBtn=el("button",{"class":"btn",style:"flex:1"},isEdit?"Speichern":"Anlegen");
   saveBtn.addEventListener("click",function(){
@@ -1092,7 +1091,6 @@ function openTagebuchForm(pflanzeId, pflanzenName, eintrag){
   if(zuordnungDiv)modalChildren.push(zuordnungDiv);
   modalChildren.push(el("div",{"class":"field"},[el("label",null,"Datum"),datumInput]));
   modalChildren.push(el("div",{"class":"field"},[el("label",null,"Text"),textArea]));
-  modalChildren.push(fotoHint);
   modalChildren.push(el("div",{"class":"modal__actions",style:"margin-top:var(--s-4)"},[cancelBtn,saveBtn]));
   scrim.appendChild(el("div",{"class":"modal"},modalChildren));
   root.appendChild(scrim);
@@ -1162,8 +1160,7 @@ function renderEinstellungen(){
       showLocationWizard();
     }},"Standort aendern")
   ]));
-  v.appendChild(el("div",{"class":"section-title"},"Weitere Einstellungen"));
-  v.appendChild(el("div",{"class":"card"},[el("p",{style:"color:var(--c-ink-mute);font-size:14px;margin:0"},"API-Key fuer Claude-Auto-Befuellung kommt in Schritt 9.")]));
+
   var logoutBtn=el("button",{"class":"btn btn--danger",style:"margin-top:var(--s-4);width:100%"},"Abmelden");
   logoutBtn.addEventListener("click",function(){confirmModal({title:"Abmelden?",text:"Du wirst ausgeloggt.",confirmLabel:"Abmelden",danger:true,onConfirm:function(){signOut(auth);}});});
   v.appendChild(logoutBtn);
@@ -1240,8 +1237,10 @@ function zeitLi(label,zeit,typ){if(!zeit||(!zeit.von&&!zeit.bis))return propLi(l
 // Kurzer Schenkel: x=0..0.6, y=0.6..1.6 → rel: x=0..0.08, y=0.375..1.0
 var BEET_W_M = 7.5;   // Breite Bounding-Box in Metern
 var BEET_H_M = 1.6;   // Höhe Bounding-Box (0.6 + 1.0)
-var BEET_LANG_H = 0.6 / BEET_H_M;  // 0.375 – relativer Anteil langer Schenkel
-var BEET_KURZ_W = 0.6 / BEET_W_M;  // 0.08  – relativer Anteil kurzer Schenkel Breite
+// Darstellung: nicht maßstäblich, aber lesbar auf Bildschirm
+// Langer Schenkel nimmt 35% der Höhe ein, kurzer Schenkel 20% der Breite
+var BEET_LANG_H = 0.35;   // visueller Anteil langer Schenkel an Gesamthöhe
+var BEET_KURZ_W = 0.20;   // visueller Anteil kurzer Schenkel an Gesamtbreite
 
 // Prüfe ob ein relativer Punkt (rx, ry) im L-Polygon liegt
 function punktImBeet(rx, ry) {
@@ -1287,7 +1286,7 @@ function legendeErstellen(numMap) {
 // onTap: callback(rx, ry) wenn auf freie Fläche getippt
 // onMarkerLongpress: callback(bp) bei Langdruck auf Marker
 function beetSVG(svgW, moving, onTap, onMarkerLongpress, filterPflanzeId) {
-  var svgH = Math.round(svgW * BEET_H_M / BEET_W_M);
+  var svgH = Math.round(svgW * 0.35);  // lesbare Höhe, nicht maßstäblich
   var numMap = nummeriereBeetpositionen();
 
   var svgNS = "http://www.w3.org/2000/svg";
@@ -1300,23 +1299,51 @@ function beetSVG(svgW, moving, onTap, onMarkerLongpress, filterPflanzeId) {
   function relToSvg(rx, ry) { return { x: Math.round(rx * svgW), y: Math.round(ry * svgH) }; }
   function svgToRel(sx, sy) { return { rx: sx / svgW, ry: sy / svgH }; }
 
-  // L-Form als einzelnes Polygon (keine Innenlinie an der Verbindungsstelle)
-  var pts = [
-    relToSvg(0, 0),
-    relToSvg(1, 0),
-    relToSvg(1, BEET_LANG_H),
-    relToSvg(BEET_KURZ_W, BEET_LANG_H),
-    relToSvg(BEET_KURZ_W, 1),
-    relToSvg(0, 1)
-  ];
-  var ptStr = pts.map(function(p){ return p.x+","+p.y; }).join(" ");
-  var polygon = document.createElementNS(svgNS, "polygon");
-  polygon.setAttribute("points", ptStr);
-  polygon.setAttribute("fill", "#e8f0e8");
-  polygon.setAttribute("stroke", "#3d5a3d");
-  polygon.setAttribute("stroke-width", "2");
-  polygon.setAttribute("stroke-linejoin", "round");
-  svg.appendChild(polygon);
+  // L-Form: zwei Rechtecke, kurzer Schenkel überlappt langen um 1px
+  // damit keine Doppellinie an der Verbindungsstelle entsteht
+  var p1a = relToSvg(0, 0);
+  var p1b = relToSvg(1, BEET_LANG_H + 1/svgH); // 1px Überlappung nach unten
+  var r1 = document.createElementNS(svgNS, "rect");
+  r1.setAttribute("x", p1a.x); r1.setAttribute("y", p1a.y);
+  r1.setAttribute("width", p1b.x - p1a.x);
+  r1.setAttribute("height", p1b.y - p1a.y);
+  r1.setAttribute("fill", "#e8f0e8");
+  r1.setAttribute("stroke", "#3d5a3d");
+  r1.setAttribute("stroke-width", "1.5");
+  svg.appendChild(r1);
+
+  var p2a = relToSvg(0, BEET_LANG_H);
+  var p2b = relToSvg(BEET_KURZ_W, 1);
+  var r2 = document.createElementNS(svgNS, "rect");
+  r2.setAttribute("x", p2a.x); r2.setAttribute("y", p2a.y);
+  r2.setAttribute("width", p2b.x - p2a.x);
+  r2.setAttribute("height", p2b.y - p2a.y);
+  r2.setAttribute("fill", "#e8f0e8");
+  r2.setAttribute("stroke", "#3d5a3d");
+  r2.setAttribute("stroke-width", "1.5");
+  // Innenkante (oben) und linke Kante (bereits durch r1 gezeichnet) ausblenden
+  // durch clipPath der die innere Kante verdeckt
+  svg.appendChild(r2);
+
+  // Deckweisse Linie über die Innenkante (horizontal, zwischen den Schenkeln)
+  var iLine = document.createElementNS(svgNS, "line");
+  var ip1 = relToSvg(BEET_KURZ_W, BEET_LANG_H);
+  var ip2 = relToSvg(1, BEET_LANG_H);
+  iLine.setAttribute("x1", ip1.x + 1); iLine.setAttribute("y1", ip1.y);
+  iLine.setAttribute("x2", ip2.x); iLine.setAttribute("y2", ip2.y);
+  iLine.setAttribute("stroke", "#e8f0e8");
+  iLine.setAttribute("stroke-width", "2");
+  svg.appendChild(iLine);
+
+  // Deckweisse Linie über die Innenkante (vertikal, rechts vom kurzen Schenkel)
+  var iLine2 = document.createElementNS(svgNS, "line");
+  var ip3 = relToSvg(BEET_KURZ_W, BEET_LANG_H);
+  var ip4 = relToSvg(BEET_KURZ_W, 1);
+  iLine2.setAttribute("x1", ip3.x); iLine2.setAttribute("y1", ip3.y + 1);
+  iLine2.setAttribute("x2", ip4.x); iLine2.setAttribute("y2", ip4.y);
+  iLine2.setAttribute("stroke", "#e8f0e8");
+  iLine2.setAttribute("stroke-width", "2");
+  svg.appendChild(iLine2);
 
   // Tap auf Karte
   var tapTimer = null;
