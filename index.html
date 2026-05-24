@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#3d5a3d" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Mein Garten" />
+<link rel="manifest" href="/manifest.json" />
+<link rel="apple-touch-icon" href="/icon-192.png" />
+<title>Mein Garten</title>
+
+<style>
+  :root {
+    --c-bg:#f6f3ec; --c-bg-card:#fffdf7; --c-ink:#1f241d; --c-ink-soft:#5a5e54;
+    --c-ink-mute:#8a8e83; --c-line:#e5e0d2; --c-line-strong:#cfc8b3;
+    --c-leaf:#3d5a3d; --c-danger:#a83232;
+    --c-warn-bg:#fff4dc; --c-warn-bd:#e6c577; --c-warn-ink:#6b4a14;
+    --c-success-bg:#edf7ed; --c-success-bd:#7fbf7f; --c-success-ink:#1e4d1e;
+    --r-md:12px; --r-lg:16px;
+    --s-1:4px;--s-2:8px;--s-3:12px;--s-4:16px;--s-5:24px;--s-6:32px;--s-7:48px;
+    --shadow-sm:0 1px 0 rgba(31,36,29,0.04),0 1px 2px rgba(31,36,29,0.06);
+    --shadow-lg:0 12px 32px rgba(31,36,29,0.18);
+    --font-display:Georgia,"Times New Roman",serif;
+    --font-body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --safe-top:env(safe-area-inset-top,0px);
+    --safe-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{font-family:var(--font-body);font-size:16px;line-height:1.45;color:var(--c-ink);background:var(--c-bg);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;}
+  h1,h2,h3{font-family:var(--font-display);font-weight:500;letter-spacing:-0.01em;margin:0;}
+  h1{font-size:28px;}h2{font-size:22px;}h3{font-size:18px;}
+  button{font-family:inherit;font-size:inherit;cursor:pointer;}
+  input,textarea,select{font-family:inherit;font-size:16px;}
+
+  #errorBanner{display:none;position:fixed;top:0;left:0;right:0;background:#a83232;color:white;padding:12px 16px;padding-top:calc(env(safe-area-inset-top,0px) + 12px);font-size:13px;font-family:monospace;z-index:999;max-height:50vh;overflow-y:auto;}
+  #errorBanner.visible{display:block;}
+  #errorBanner button{float:right;background:white;color:#a83232;border:none;padding:4px 10px;border-radius:4px;margin-left:8px;font-weight:bold;}
+
+  /* Auth-Screen */
+  #authScreen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--s-5);padding-top:calc(var(--safe-top) + var(--s-5));background:var(--c-bg);}
+  .auth-card{width:100%;max-width:380px;background:var(--c-bg-card);border:1px solid var(--c-line);border-radius:20px;padding:var(--s-6) var(--s-5);box-shadow:var(--shadow-lg);}
+  .auth-logo{font-family:var(--font-display);font-size:32px;color:var(--c-leaf);margin-bottom:var(--s-1);}
+  .auth-tagline{font-size:14px;color:var(--c-ink-mute);margin-bottom:var(--s-6);}
+  .auth-card h2{margin-bottom:var(--s-2);}
+  .auth-card p{color:var(--c-ink-soft);font-size:15px;margin:0 0 var(--s-4);}
+  .auth-input{width:100%;padding:14px;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:var(--c-bg);color:var(--c-ink);outline:none;margin-bottom:var(--s-3);}
+  .auth-input:focus{border-color:var(--c-leaf);}
+  .auth-btn{width:100%;padding:14px;border-radius:var(--r-md);border:none;background:var(--c-leaf);color:white;font-weight:600;font-size:16px;cursor:pointer;}
+  .auth-btn:active{transform:scale(0.98);}
+  .auth-btn:disabled{opacity:0.6;cursor:default;}
+  .auth-btn--secondary{background:transparent;color:var(--c-leaf);border:1px solid var(--c-leaf);margin-top:var(--s-2);}
+  .auth-hint{font-size:13px;color:var(--c-ink-mute);text-align:center;margin-top:var(--s-3);}
+
+  /* Wizard-Steps */
+  .wizard-steps{display:flex;gap:var(--s-2);margin-bottom:var(--s-5);}
+  .wizard-step{flex:1;height:4px;border-radius:2px;background:var(--c-line);}
+  .wizard-step.done{background:var(--c-leaf);}
+  .wizard-step.active{background:var(--c-leaf-soft,#6b8a6b);}
+
+  .location-opts{display:flex;flex-direction:column;gap:var(--s-2);margin-bottom:var(--s-3);}
+  .location-opt{padding:14px;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:var(--c-bg-card);color:var(--c-ink);text-align:left;font-size:15px;}
+  .location-opt:active{background:var(--c-line);}
+
+  .banner-success{background:var(--c-success-bg);border:1px solid var(--c-success-bd);color:var(--c-success-ink);padding:var(--s-3) var(--s-4);border-radius:var(--r-md);font-size:14px;margin-bottom:var(--s-3);}
+  .banner-warn{background:var(--c-warn-bg);border:1px solid var(--c-warn-bd);color:var(--c-warn-ink);padding:var(--s-3) var(--s-4);border-radius:var(--r-md);font-size:14px;margin-bottom:var(--s-3);}
+
+  .spinner{width:24px;height:24px;border:3px solid var(--c-line);border-top-color:var(--c-leaf);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto var(--s-3);}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* App shell */
+  #app{min-height:100vh;display:flex;flex-direction:column;}
+  .topbar{position:sticky;top:0;z-index:40;padding:calc(var(--safe-top) + var(--s-3)) var(--s-4) var(--s-3);background:var(--c-bg);border-bottom:1px solid var(--c-line);display:flex;align-items:center;gap:var(--s-3);}
+  .topbar__title{font-family:var(--font-display);font-size:20px;font-weight:500;flex:1;}
+  .topbar__title span{color:var(--c-leaf);}
+  .topbar__user{font-size:12px;color:var(--c-ink-mute);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .iconbtn{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border:none;background:transparent;border-radius:var(--r-md);color:var(--c-ink);font-size:22px;}
+  .iconbtn:active{background:var(--c-line);}
+  main{flex:1;padding:var(--s-4);padding-bottom:calc(var(--s-7) + var(--safe-bottom));max-width:720px;width:100%;margin:0 auto;}
+
+  /* Drawer */
+  .drawer-scrim{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(31,36,29,0.5);opacity:0;pointer-events:none;transition:opacity 180ms ease;z-index:50;}
+  .drawer-scrim.open{opacity:1;pointer-events:auto;}
+  .drawer{position:fixed;top:0;bottom:0;left:0;width:82%;max-width:320px;background:var(--c-bg-card);transform:translateX(-100%);transition:transform 220ms cubic-bezier(0.2,0.8,0.2,1);z-index:51;display:flex;flex-direction:column;padding-top:var(--safe-top);box-shadow:var(--shadow-lg);}
+  .drawer.open{transform:translateX(0);}
+  .drawer__brand{padding:var(--s-5) var(--s-5) var(--s-3);font-family:var(--font-display);font-size:22px;color:var(--c-leaf);border-bottom:1px solid var(--c-line);}
+  .drawer__brand small{display:block;font-family:var(--font-body);font-size:12px;color:var(--c-ink-mute);margin-top:2px;letter-spacing:0.04em;text-transform:uppercase;}
+  .drawer__user{padding:var(--s-3) var(--s-5);font-size:13px;color:var(--c-ink-mute);border-bottom:1px solid var(--c-line);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .drawer__nav{padding:var(--s-3) 0;flex:1;overflow-y:auto;}
+  .drawer__item{display:flex;align-items:center;gap:var(--s-3);padding:var(--s-3) var(--s-5);color:var(--c-ink);text-decoration:none;background:transparent;border:none;width:100%;text-align:left;font-size:16px;font-weight:500;}
+  .drawer__item:active{background:var(--c-line);}
+  .drawer__item.active{color:var(--c-leaf);background:rgba(61,90,61,0.07);border-left:3px solid var(--c-leaf);padding-left:calc(var(--s-5) - 3px);}
+  .drawer__item .ico{font-size:20px;width:22px;text-align:center;}
+  .drawer__item--danger{color:var(--c-danger);}
+
+  /* Cards / Sections */
+  .section-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--c-ink-mute);margin:var(--s-5) 0 var(--s-3);}
+  .card{background:var(--c-bg-card);border:1px solid var(--c-line);border-radius:var(--r-lg);padding:var(--s-4);box-shadow:var(--shadow-sm);}
+
+  /* Home */
+  .hero{margin-top:var(--s-2);}
+  .hero__greeting{font-family:var(--font-display);font-size:28px;line-height:1.15;margin-bottom:var(--s-1);}
+  .hero__date{color:var(--c-ink-mute);font-size:14px;}
+  .weather-card__placeholder{font-size:13px;color:var(--c-ink-mute);font-style:italic;}
+
+  /* Plant list */
+  .search{position:relative;margin-bottom:var(--s-3);}
+  .search input{width:100%;padding:var(--s-3) var(--s-3) var(--s-3) 40px;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:var(--c-bg-card);color:var(--c-ink);outline:none;}
+  .search input:focus{border-color:var(--c-leaf);}
+  .search .search-ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--c-ink-mute);pointer-events:none;}
+  .plant-grid{display:grid;gap:var(--s-3);}
+  .plant-card{background:var(--c-bg-card);border:1px solid var(--c-line);border-radius:var(--r-lg);padding:var(--s-3) var(--s-4);display:flex;align-items:center;gap:var(--s-3);text-decoration:none;color:inherit;}
+  .plant-card:active{transform:scale(0.99);}
+  .plant-card__emoji{font-size:30px;width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:var(--c-bg);border-radius:var(--r-md);flex-shrink:0;}
+  .plant-card__body{flex:1;min-width:0;}
+  .plant-card__name{font-family:var(--font-display);font-size:18px;font-weight:500;}
+  .plant-card__meta{font-size:13px;color:var(--c-ink-mute);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .plant-card__chev{color:var(--c-ink-mute);font-size:18px;}
+  .empty{text-align:center;padding:var(--s-7) var(--s-4);color:var(--c-ink-mute);}
+  .empty h3{color:var(--c-ink);margin-bottom:var(--s-2);}
+
+  /* FAB */
+  .fab{position:fixed;right:var(--s-4);bottom:calc(var(--s-4) + var(--safe-bottom));width:56px;height:56px;border-radius:50%;background:var(--c-leaf);color:white;border:none;font-size:30px;line-height:1;box-shadow:var(--shadow-lg);z-index:30;}
+  .fab:active{transform:scale(0.95);}
+
+  /* Detail */
+  .detail-head{display:flex;align-items:center;gap:var(--s-3);margin-bottom:var(--s-4);}
+  .detail-head__emoji{font-size:44px;width:64px;height:64px;display:flex;align-items:center;justify-content:center;background:var(--c-bg-card);border:1px solid var(--c-line);border-radius:var(--r-lg);}
+  .detail-head__title h1{font-size:26px;line-height:1.1;}
+  .detail-head__title em{font-style:italic;color:var(--c-ink-mute);font-size:14px;font-family:var(--font-display);}
+  .props{list-style:none;padding:0;margin:0;}
+  .props li{display:flex;justify-content:space-between;gap:var(--s-3);padding:var(--s-3) 0;border-bottom:1px solid var(--c-line);font-size:15px;}
+  .props li:last-child{border-bottom:none;}
+  .props li .k{color:var(--c-ink-mute);flex-shrink:0;}
+  .props li .v{text-align:right;color:var(--c-ink);}
+  .props li .v.empty{color:var(--c-ink-mute);font-style:italic;}
+  .pflege-text{white-space:pre-wrap;color:var(--c-ink);line-height:1.55;font-size:15px;}
+  .pflege-text.empty{color:var(--c-ink-mute);font-style:italic;}
+  .tags{display:flex;flex-wrap:wrap;gap:var(--s-2);}
+  .tag{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--c-bg);border:1px solid var(--c-line-strong);font-size:13px;color:var(--c-ink-soft);}
+  .detail-actions{display:flex;gap:var(--s-3);margin-top:var(--s-5);}
+
+  /* Tagebuch in Detail */
+  .tagebuch-eintrag{padding:var(--s-3) 0;border-bottom:1px solid var(--c-line);}
+  .tagebuch-eintrag:last-child{border-bottom:none;}
+  .tagebuch-eintrag__header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+  .tagebuch-eintrag__datum{font-size:13px;color:var(--c-ink-mute);}
+  .tagebuch-eintrag__actions{display:flex;gap:var(--s-2);}
+  .tagebuch-eintrag__text{font-size:15px;line-height:1.5;white-space:pre-wrap;}
+  .tagebuch-eintrag__foto{margin-top:var(--s-2);width:100%;max-height:200px;object-fit:cover;border-radius:var(--r-md);border:1px solid var(--c-line);}
+  .link-btn{background:none;border:none;color:var(--c-leaf);font-size:13px;padding:2px 4px;cursor:pointer;}
+  .link-btn--danger{color:var(--c-danger);}
+
+  /* Mini-Beetkarte */
+  .beet-mini{background:var(--c-bg);border-radius:var(--r-md);padding:var(--s-3);text-align:center;font-size:13px;color:var(--c-ink-mute);font-style:italic;}
+
+  /* Buttons */
+  .btn{padding:12px 18px;border-radius:var(--r-md);border:1px solid transparent;background:var(--c-leaf);color:white;font-weight:500;font-size:15px;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;}
+  .btn:active{transform:scale(0.98);}
+  .btn--ghost{background:transparent;color:var(--c-ink);border-color:var(--c-line-strong);}
+  .btn--danger{background:transparent;color:var(--c-danger);border-color:var(--c-danger);}
+  .btn--sm{padding:8px 14px;font-size:14px;}
+
+  /* Form */
+  .form{display:flex;flex-direction:column;gap:var(--s-4);}
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field label{font-size:13px;font-weight:600;color:var(--c-ink-soft);}
+  .field input,.field textarea,.field select{padding:12px;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:var(--c-bg-card);color:var(--c-ink);outline:none;}
+  .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--c-leaf);}
+  .field textarea{min-height:100px;resize:vertical;}
+  .field-hint{font-size:12px;color:var(--c-ink-mute);}
+  .field-group{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-3);}
+  .field-group--3{grid-template-columns:1fr 1fr 1fr;}
+  fieldset{border:1px solid var(--c-line);border-radius:var(--r-md);padding:var(--s-3) var(--s-4);margin:0;}
+  fieldset legend{font-size:13px;font-weight:600;color:var(--c-ink-soft);padding:0 var(--s-2);}
+  .tristate{display:flex;gap:var(--s-2);}
+  .tristate button{flex:1;padding:10px;background:var(--c-bg-card);border:1px solid var(--c-line-strong);border-radius:var(--r-md);color:var(--c-ink-soft);font-size:14px;}
+  .tristate button.active{background:var(--c-leaf);color:white;border-color:var(--c-leaf);}
+
+  /* Modal */
+  .modal-scrim{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(31,36,29,0.55);display:flex;align-items:flex-end;justify-content:center;z-index:60;}
+  .modal{background:var(--c-bg-card);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:var(--s-5) var(--s-4) calc(var(--s-4) + var(--safe-bottom));box-shadow:var(--shadow-lg);}
+  .modal h2{margin-bottom:var(--s-2);}
+  .modal p{color:var(--c-ink-soft);margin:0 0 var(--s-4);}
+  .modal__actions{display:flex;gap:var(--s-3);}
+  .modal__actions .btn{flex:1;}
+
+  /* Toast */
+  .toast{position:fixed;left:50%;bottom:calc(var(--s-5) + var(--safe-bottom));transform:translateX(-50%);background:var(--c-ink);color:white;padding:12px 18px;border-radius:var(--r-md);font-size:14px;box-shadow:var(--shadow-lg);z-index:70;}
+
+  /* Placeholder */
+  .placeholder{text-align:center;padding:var(--s-7) var(--s-4);color:var(--c-ink-mute);}
+  .placeholder h2{color:var(--c-ink);margin-bottom:var(--s-2);}
+
+  @media(max-width:360px){main{padding:var(--s-3);}}
+
+  /* Beetkarte */
+  .beet-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .beet-svg{display:block;touch-action:none;cursor:crosshair;}
+  .beet-rect{fill:#e8f0e8;stroke:#3d5a3d;stroke-width:2;}
+  .beet-marker{cursor:pointer;}
+  .beet-marker circle{fill:#3d5a3d;stroke:white;stroke-width:2;}
+  .beet-marker.moving circle{fill:#b8612a;stroke:white;stroke-width:2;}
+  .beet-marker text{fill:white;font-size:11px;font-weight:600;text-anchor:middle;dominant-baseline:central;pointer-events:none;}
+  .beet-hint{background:var(--c-warn-bg);border:1px solid var(--c-warn-bd);color:var(--c-warn-ink);padding:var(--s-2) var(--s-3);border-radius:var(--r-md);font-size:13px;text-align:center;margin-bottom:var(--s-3);}
+  .legende{list-style:none;padding:0;margin:0;}
+  .legende li{display:flex;align-items:center;gap:var(--s-2);padding:var(--s-2) 0;border-bottom:1px solid var(--c-line);font-size:14px;}
+  .legende li:last-child{border-bottom:none;}
+  .legende__dot{width:20px;height:20px;border-radius:50%;background:var(--c-leaf);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .legende__dot span{font-size:9px;font-weight:700;color:white;}
+  .legende__name{flex:1;}
+  .legende__nums{font-size:12px;color:var(--c-ink-mute);}
+  /* Action Sheet */
+  .action-sheet-scrim{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(31,36,29,0.45);z-index:60;display:flex;align-items:flex-end;justify-content:center;}
+  .action-sheet{background:var(--c-bg-card);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:var(--s-3) var(--s-3) calc(var(--s-4) + var(--safe-bottom));box-shadow:var(--shadow-lg);}
+  .action-sheet__title{text-align:center;font-size:13px;color:var(--c-ink-mute);padding:var(--s-2) var(--s-4) var(--s-3);}
+  .action-sheet__btn{display:block;width:100%;padding:16px;text-align:center;font-size:17px;background:var(--c-bg);border:none;border-radius:var(--r-md);margin-bottom:var(--s-2);color:var(--c-ink);}
+  .action-sheet__btn:active{background:var(--c-line);}
+  .action-sheet__btn--danger{color:var(--c-danger);}
+  .action-sheet__cancel{display:block;width:100%;padding:16px;text-align:center;font-size:17px;font-weight:600;background:var(--c-bg-card);border:1px solid var(--c-line);border-radius:var(--r-md);margin-top:var(--s-2);color:var(--c-ink);}
+
+  /* Wetter-Card */
+  .weather-card{display:flex;align-items:center;gap:var(--s-4);}
+  .weather-card__icon{font-size:40px;line-height:1;flex-shrink:0;}
+  .weather-card__temp{font-family:var(--font-display);font-size:40px;font-weight:500;line-height:1;color:var(--c-ink);}
+  .weather-card__details{flex:1;}
+  .weather-card__desc{font-size:14px;color:var(--c-ink-soft);margin-top:2px;}
+  .weather-card__minmax{font-size:13px;color:var(--c-ink-mute);margin-top:2px;}
+  .weather-card__loading{font-size:13px;color:var(--c-ink-mute);font-style:italic;}
+  .frost-banner{background:#e8f0ff;border:1px solid #99aadd;color:#223;padding:var(--s-3) var(--s-4);border-radius:var(--r-md);font-size:14px;margin-top:var(--s-3);}
+  .frost-banner strong{color:#334499;}
+</style>
+</head>
+<body>
+
+<div id="errorBanner">
+  <button onclick="document.getElementById('errorBanner').classList.remove('visible')">X</button>
+  <strong>Fehler:</strong> <span id="errorText"></span>
+</div>
+
+<div id="authScreen">
+  <div class="auth-card">
+    <div class="auth-logo">Mein Garten</div>
+    <div class="auth-tagline">Dein persoenliches Gartentagebuch</div>
+    <div id="authContent"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+  <header class="topbar">
+    <button class="iconbtn" id="btnMenu" aria-label="Menue">&#9776;</button>
+    <div class="topbar__title" id="topbarTitle">Mein <span>Garten</span></div>
+    <div class="topbar__user" id="topbarUser"></div>
+  </header>
+  <main id="view"><div class="placeholder"><h2>Lade...</h2></div></main>
+</div>
+
+<div class="drawer-scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer__brand">Mein Garten<small>Pflanzen &middot; Beet &middot; Tagebuch</small></div>
+  <div class="drawer__user" id="drawerUser"></div>
+  <nav class="drawer__nav" id="drawerNav"></nav>
+</aside>
+
+<button class="fab" id="fab" hidden>+</button>
+<div id="modalRoot"></div>
+<div id="toastRoot"></div>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import{initializeFirestore,persistentLocalCache,persistentSingleTabManager,collection,doc,getDocs,setDoc,deleteDoc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+"use strict";
+
+function statusLog(msg) {
+  var c = document.getElementById("authContent");
+  if (!c) return;
+  var d = document.createElement("div");
+  d.style.cssText = "font-size:11px;color:#666;text-align:center;margin-top:4px;";
+  d.textContent = msg;
+  c.appendChild(d);
+}
+window.onerror = function(msg,src,line){
+  var b=document.getElementById("errorBanner"),t=document.getElementById("errorText");
+  if(b&&t){t.textContent=msg+" Zeile:"+line;b.classList.add("visible");}
+  statusLog("FEHLER: "+msg);
+  return false;
+};
+window.addEventListener("unhandledrejection",function(e){
+  var r=e&&e.reason,msg=r&&r.message?r.message:String(r||"?");
+  var b=document.getElementById("errorBanner"),t=document.getElementById("errorText");
+  if(b&&t){t.textContent="Promise: "+msg;b.classList.add("visible");}
+  statusLog("PROMISE-FEHLER: "+msg);
+});
+statusLog("1/4 Script gestartet");
+
+const firebaseConfig={
+  apiKey:"AIzaSyA_Kcp1DAuM91UvHuqca8LzFgdZ9AJvNG4",
+  authDomain:"gartenpflanzenapp.firebaseapp.com",
+  projectId:"gartenpflanzenapp",
+  storageBucket:"gartenpflanzenapp.firebasestorage.app",
+  messagingSenderId:"356755292978",
+  appId:"1:356755292978:web:f3bac1181abac6684c8d2b"
+};
+const firebaseApp=initializeApp(firebaseConfig);
+const auth=getAuth(firebaseApp);
+var db=initializeFirestore(firebaseApp,{
+  localCache:persistentLocalCache({tabManager:persistentSingleTabManager({})})
+});
+var googleProvider = new GoogleAuthProvider();
+
+// ---- Helfer ----
+function uuid(){
+  if(typeof crypto!=="undefined"&&typeof crypto.randomUUID==="function")return crypto.randomUUID();
+  return"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,function(c){var r=Math.random()*16|0;return(c==="x"?r:(r&0x3)|0x8).toString(16);});
+}
+function heute(){
+  var d=new Date(),m=String(d.getMonth()+1),t=String(d.getDate());
+  if(m.length<2)m="0"+m;if(t.length<2)t="0"+t;
+  return d.getFullYear()+"-"+m+"-"+t;
+}
+function formatDatum(iso){if(!iso)return"";var p=iso.split("-");return p[2]+"."+p[1]+"."+p[0];}
+function el(tag,attrs,children){
+  var e=document.createElement(tag);
+  if(attrs){for(var k in attrs){if(!Object.prototype.hasOwnProperty.call(attrs,k))continue;var v=attrs[k];
+    if(k==="class")e.className=v;else if(k==="html")e.innerHTML=v;
+    else if(k.indexOf("on")===0&&typeof v==="function")e.addEventListener(k.slice(2),v);
+    else if(v===true)e.setAttribute(k,"");else if(v===false||v==null){}else e.setAttribute(k,v);}}
+  if(children!=null){if(Object.prototype.toString.call(children)!=="[object Array]")children=[children];
+    for(var i=0;i<children.length;i++){var c=children[i];if(c==null||c===false)continue;e.appendChild(typeof c==="string"?document.createTextNode(c):c);}}
+  return e;
+}
+function clear(node){while(node.firstChild)node.removeChild(node.firstChild);}
+function toast(msg,ms){if(ms==null)ms=2200;var root=document.getElementById("toastRoot");clear(root);var t=el("div",{"class":"toast"},msg);root.appendChild(t);setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},ms);}
+function confirmModal(opts){
+  var root=document.getElementById("modalRoot");clear(root);
+  function close(){clear(root);}
+  var scrim=el("div",{"class":"modal-scrim"});
+  scrim.addEventListener("click",function(e){if(e.target===scrim)close();});
+  scrim.appendChild(el("div",{"class":"modal"},[
+    el("h2",null,opts.title),opts.text?el("p",null,opts.text):null,
+    el("div",{"class":"modal__actions"},[
+      el("button",{"class":"btn btn--ghost",onclick:close},"Abbrechen"),
+      el("button",{"class":"btn"+(opts.danger?" btn--danger":""),onclick:function(){close();opts.onConfirm();}},opts.confirmLabel||"OK")
+    ])
+  ]));
+  root.appendChild(scrim);
+}
+
+// ---- Konstanten ----
+var KATEGORIEN=["Gemuese","Kraeuter","Blumen","Straeucher","Obst","Sonstiges"];
+var WASSERBEDARF=["Gering","Mittel","Hoch"];
+var STANDORTE=["Sonnig","Halbschatten","Schatten"];
+var AUSSAAT_TYP=["Vorkultur","Direktsaat"];
+var MONATE=["Januar","Februar","Maerz","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+
+// ---- State ----
+var state={
+  user:null,
+  wizardDone:false,   // true sobald Standort-Wizard abgeschlossen
+  pflanzen:[],
+  beetpositionen:[],
+  tagebuch:[],
+  einstellungen:{standort:{lat:51.7189,lon:8.7575,name:"Paderborn"}},
+  suchtext:""
+};
+
+// ================================================================
+// FIRESTORE CRUD (Schritt 6)
+// ================================================================
+
+// Hilfsfunktion: null-Werte aus Objekt entfernen fuer Firestore
+function cleanForFirestore(obj) {
+  var out = {};
+  for (var k in obj) {
+    if (!Object.prototype.hasOwnProperty.call(obj,k)) continue;
+    var v = obj[k];
+    if (v === null || v === undefined) continue;
+    if (typeof v === "object" && !Array.isArray(v)) {
+      var sub = cleanForFirestore(v);
+      if (Object.keys(sub).length > 0) out[k] = sub;
+    } else {
+      out[k] = v;
+    }
+  }
+  return out;
+}
+
+// Pfad-Helfer
+function colRef(name) { return collection(db,"users",state.user.uid,name); }
+function docRef(name,id) { return doc(db,"users",state.user.uid,name,id); }
+
+// Alle Daten laden
+function ladeAlleDaten(onDone) {
+  var uid = state.user.uid;
+  statusLog("Lade Daten aus Firestore...");
+  var promises = [
+    getDocs(collection(db,"users",uid,"pflanzen")),
+    getDocs(collection(db,"users",uid,"beetpositionen")),
+    getDocs(collection(db,"users",uid,"tagebuch")),
+    getDoc(doc(db,"users",uid,"einstellungen","default"))
+  ];
+  Promise.all(promises).then(function(results) {
+    // Schema-Migration §16: fehlende schemaVersion wird als 1 behandelt
+    state.pflanzen = results[0].docs.map(function(d) {
+      var data = d.data();
+      if (!data.schemaVersion) data.schemaVersion = 1;
+      return data;
+    });
+    state.beetpositionen = results[1].docs.map(function(d){ return d.data(); });
+    state.tagebuch = results[2].docs.map(function(d){ return d.data(); });
+    var einstellDoc = results[3];
+    if (einstellDoc.exists()) {
+      var eData = einstellDoc.data();
+      if (eData.standort) state.einstellungen.standort = eData.standort;
+    }
+    statusLog("Daten geladen: "+state.pflanzen.length+" Pflanzen");
+    onDone();
+  }).catch(function(err) {
+    statusLog("Ladefehler: "+(err&&err.message?err.message:String(err)));
+    toast("Fehler beim Laden. Bitte neu laden.");
+    onDone(); // trotzdem starten mit leeren Daten
+  });
+}
+
+// Pflanze speichern (anlegen + bearbeiten)
+function fsSetPflanze(pflanze, onDone) {
+  setDoc(docRef("pflanzen", pflanze.id), cleanForFirestore(pflanze))
+    .then(function(){ if(onDone) onDone(); })
+    .catch(function(err){ toast("Speichern fehlgeschlagen."); console.error(err); if(onDone) onDone(); });
+}
+
+// Pflanze loeschen (inkl. Beetpositionen kaskadiert)
+function fsDeletePflanze(pflanzeId, onDone) {
+  var bp = state.beetpositionen.filter(function(b){ return b.pflanzeId===pflanzeId; });
+  var delPromises = bp.map(function(b){ return deleteDoc(docRef("beetpositionen",b.id)); });
+  delPromises.push(deleteDoc(docRef("pflanzen",pflanzeId)));
+  Promise.all(delPromises)
+    .then(function(){ if(onDone) onDone(); })
+    .catch(function(err){ toast("Loeschen fehlgeschlagen."); console.error(err); if(onDone) onDone(); });
+}
+
+// Beetposition speichern
+function fsSetBeetposition(bp, onDone) {
+  setDoc(docRef("beetpositionen", bp.id), cleanForFirestore(bp))
+    .then(function(){ if(onDone) onDone(); })
+    .catch(function(err){ toast("Speichern fehlgeschlagen."); console.error(err); if(onDone) onDone(); });
+}
+
+// Beetposition loeschen
+function fsDeleteBeetposition(bpId, onDone) {
+  deleteDoc(docRef("beetpositionen",bpId))
+    .then(function(){ if(onDone) onDone(); })
+    .catch(function(err){ toast("Loeschen fehlgeschlagen."); console.error(err); if(onDone) onDone(); });
+}
+
+// Tagebucheintrag speichern
+function fsSetTagebuch(eintrag, onDone) {
+  setDoc(docRef("tagebuch", eintrag.id), cleanForFirestore(eintrag))
+    .then(function(){ if(onDone) onDone(); })
+    .catch(function(err){ toast("Speichern fehlgeschlagen."); console.error(err); if(onDone) onDone(); });
+}
+
+// Tagebucheintrag loeschen
+function fsDeleteTagebuch(eintragId, onDone) {
+  deleteDoc(docRef("tagebuch",eintragId))
+    .then(function(){ if(onDone) onDone(); })
+    .catch(function(err){ toast("Loeschen fehlgeschlagen."); console.error(err); if(onDone) onDone(); });
+}
+
+// Einstellungen speichern
+function fsSaveEinstellungen() {
+  setDoc(doc(db,"users",state.user.uid,"einstellungen","default"), cleanForFirestore(state.einstellungen))
+    .catch(function(err){ console.error("Einstellungen speichern:", err); });
+}
+
+// ================================================================
+// AUTH + WIZARD
+// ================================================================
+
+function showAuthScreen(){
+  document.getElementById("authScreen").style.display="flex";
+  document.getElementById("app").style.display="none";
+  renderLoginForm();
+}
+
+function renderLoginForm(){
+  var content=document.getElementById("authContent");clear(content);
+  var statusDiv=el("div");
+  var btn=el("button",{"class":"auth-btn"},"Mit Google anmelden");
+  btn.addEventListener("click",function(){
+    btn.disabled=true;
+    btn.textContent="Bitte warten...";
+    clear(statusDiv);
+    signInWithPopup(auth, googleProvider)
+      .then(function(result){
+        // onAuthStateChanged kuemmert sich um den Rest
+      })
+      .catch(function(err){
+        btn.disabled=false;
+        btn.textContent="Mit Google anmelden";
+        clear(statusDiv);
+        var msg="Anmeldung fehlgeschlagen.";
+        if(err.code==="auth/popup-blocked")msg="Popup wurde blockiert. Bitte Popup-Blocker deaktivieren oder erneut versuchen.";
+        else if(err.code==="auth/popup-closed-by-user")msg="Anmeldung abgebrochen.";
+        else if(err.message)msg=err.message;
+        statusDiv.appendChild(el("div",{"class":"banner-warn"},msg));
+      });
+  });
+  content.appendChild(el("h2",null,"Willkommen"));
+  content.appendChild(el("p",null,"Melde dich mit deinem Google-Konto an um deine Pflanzendaten zu speichern."));
+  content.appendChild(statusDiv);
+  content.appendChild(btn);
+  content.appendChild(el("div",{"class":"auth-hint"},"Nur du hast Zugang zu deinen Pflanzendaten."));
+}
+
+
+
+// ---- Standort-Wizard (Schritt 2 des Setup-Wizards) ----
+// Wird einmalig nach dem ersten Login angezeigt.
+// "Einmalig" = solange wizardDone false ist. In Schritt 6 wird das in Firestore persistiert.
+function showLocationWizard(){
+  var content=document.getElementById("authContent");clear(content);
+  // Progress-Indicator: 2 Schritte, wir sind bei Schritt 2
+  content.appendChild(el("div",{"class":"wizard-steps"},[
+    el("div",{"class":"wizard-step done"}),
+    el("div",{"class":"wizard-step active"})
+  ]));
+  content.appendChild(el("h2",null,"Dein Standort"));
+  content.appendChild(el("p",null,"Fuer Wetterdaten und Frostwarnungen benoetigen wir deinen Standort."));
+  var statusDiv=el("div");
+  content.appendChild(statusDiv);
+
+  // Option 1: GPS
+  var gpsBtn=el("button",{"class":"location-opt"},"Standort automatisch ermitteln (GPS)");
+  gpsBtn.addEventListener("click",function(){
+    if(!navigator.geolocation){
+      clear(statusDiv);
+      statusDiv.appendChild(el("div",{"class":"banner-warn"},"GPS nicht verfuegbar. Bitte Ort manuell eingeben."));
+      return;
+    }
+    gpsBtn.disabled=true;gpsBtn.textContent="Ermittle Standort...";
+    navigator.geolocation.getCurrentPosition(
+      function(pos){
+        state.einstellungen.standort={lat:pos.coords.latitude,lon:pos.coords.longitude,name:"Mein Standort"};
+        // Ortsname per Reverse-Geocoding via Open-Meteo (kommt in Schritt 7 vollstaendig)
+        // Vorerst: Koordinaten als Name
+        state.einstellungen.standort.name=pos.coords.latitude.toFixed(2)+"N, "+pos.coords.longitude.toFixed(2)+"E";
+        state.wizardDone=true;
+        finishWizard();
+      },
+      function(err){
+        gpsBtn.disabled=false;gpsBtn.textContent="Standort automatisch ermitteln (GPS)";
+        clear(statusDiv);
+        var msg="GPS nicht erlaubt.";
+        if(err.code===1)msg="GPS-Zugriff verweigert. Bitte manuell eingeben oder in den Browser-Einstellungen erlauben.";
+        statusDiv.appendChild(el("div",{"class":"banner-warn"},msg));
+      },
+      {timeout:10000}
+    );
+  });
+
+  // Option 2: Manuelle Eingabe
+  var manualInput=el("input",{"class":"auth-input",type:"text",placeholder:"z. B. Muenchen oder Graz",autocomplete:"off",style:"margin-top:var(--s-3)"});
+  var manualBtn=el("button",{"class":"auth-btn"},"Ort bestaetigen");
+  manualBtn.addEventListener("click",function(){
+    var ort=manualInput.value.trim();
+    if(!ort){clear(statusDiv);statusDiv.appendChild(el("div",{"class":"banner-warn"},"Bitte einen Ort eingeben."));return;}
+    manualBtn.disabled=true;manualBtn.textContent="Suche...";clear(statusDiv);
+    // Open-Meteo Geocoding API (kostenlos, kein Key)
+    fetch("https://geocoding-api.open-meteo.com/v1/search?name="+encodeURIComponent(ort)+"&count=1&language=de&format=json")
+      .then(function(r){return r.json();})
+      .then(function(data){
+        if(!data.results||!data.results.length){
+          manualBtn.disabled=false;manualBtn.textContent="Ort bestaetigen";
+          clear(statusDiv);statusDiv.appendChild(el("div",{"class":"banner-warn"},"Ort nicht gefunden. Bitte anders schreiben."));
+          return;
+        }
+        var r=data.results[0];
+        state.einstellungen.standort={lat:r.latitude,lon:r.longitude,name:r.name+(r.country?" ("+r.country+")":"")};
+        state.wizardDone=true;
+        finishWizard();
+      })
+      .catch(function(){
+        manualBtn.disabled=false;manualBtn.textContent="Ort bestaetigen";
+        clear(statusDiv);statusDiv.appendChild(el("div",{"class":"banner-warn"},"Netzwerkfehler. Bitte Verbindung pruefen oder spaeter versuchen."));
+      });
+  });
+
+  // Option 3: Ueberspringen
+  var skipBtn=el("button",{"class":"auth-btn auth-btn--secondary",style:"margin-top:var(--s-2)"},"Spaeter einrichten");
+  skipBtn.addEventListener("click",function(){state.wizardDone=true;finishWizard();});
+
+  content.appendChild(el("div",{"class":"location-opts"},[gpsBtn]));
+  content.appendChild(manualInput);
+  content.appendChild(manualBtn);
+  content.appendChild(skipBtn);
+}
+
+function finishWizard(){
+  var standort=state.einstellungen.standort.name;
+  if(standort) toast("Standort gesetzt: "+standort,2500);
+  // Standort in Firestore speichern
+  fsSaveEinstellungen();
+  ladeAlleDaten(function(){
+    document.getElementById("authScreen").style.display="none";
+    document.getElementById("app").style.display="flex";
+    buildDrawer();
+    route();
+  });
+}
+
+// ---- Auth State ----
+statusLog("2/4 Warte auf Auth...");
+onAuthStateChanged(auth,function(user){
+  if(user){
+    statusLog("3/4 User: "+user.email);
+    state.user=user;
+    state.wizardDone=true;
+    var email=user.email||"";
+    document.getElementById("topbarUser").textContent=email;
+    document.getElementById("drawerUser").textContent=email;
+    statusLog("4/4 Lade Firestore-Daten...");
+    ladeAlleDaten(function(){
+      document.getElementById("authScreen").style.display="none";
+      document.getElementById("app").style.display="flex";
+      buildDrawer();
+      route();
+      statusLog("FERTIG");
+    });
+  } else {
+    statusLog("Kein User - Login");
+    state.user=null;
+    showAuthScreen();
+  }
+});
+
+// ================================================================
+// ROUTING
+// ================================================================
+var NAV_ITEMS=[
+  {hash:"#/",label:"Startseite",icon:"H"},
+  {hash:"#/pflanzen",label:"Pflanzen",icon:"P"},
+  {hash:"#/beetkarte",label:"Beetkarte",icon:"B"},
+  {hash:"#/tagebuch",label:"Tagebuch",icon:"T"},
+  {hash:"#/einstellungen",label:"Einstellungen",icon:"E"}
+];
+
+function route(){
+  var hash=location.hash.replace(/^#/,"");if(!hash)hash="/";
+  var parts=hash.split("/").filter(function(s){return s!=="";});
+  if(hash==="/")renderHome();
+  else if(hash==="/pflanzen")renderPflanzenListe();
+  else if(hash==="/pflanzen/neu")renderPflanzeForm(null);
+  else if(parts[0]==="pflanzen"&&parts[1]&&parts.length===2)renderPflanzeDetail(parts[1]);
+  else if(parts[0]==="pflanzen"&&parts[1]&&parts[2]==="bearbeiten")renderPflanzeForm(parts[1]);
+  else if(hash==="/beetkarte")renderBeetkarte();
+  else if(hash==="/tagebuch")renderTagebuchGesamt();
+  else if(hash==="/einstellungen")renderEinstellungen();
+  else renderHome();
+  applyChrome(hash);
+}
+
+function applyChrome(hash){
+  var items=document.querySelectorAll("#drawerNav .drawer__item");
+  for(var i=0;i<items.length;i++){
+    var h=items[i].getAttribute("data-hash");
+    var active=(h===hash)||(hash.indexOf("/pflanzen")===0&&h==="/pflanzen");
+    items[i].className="drawer__item"+(active?" active":"");
+  }
+  var fab=document.getElementById("fab");
+  if(hash==="/pflanzen"){fab.hidden=false;fab.onclick=function(){location.hash="#/pflanzen/neu";};}
+  else if(hash==="/tagebuch"){fab.hidden=false;fab.onclick=function(){openTagebuchForm(null,null);};}
+  else{fab.hidden=true;fab.onclick=null;}
+  var titles={"/":"Mein <span>Garten</span>","/pflanzen":"Pflanzen","/pflanzen/neu":"Neue Pflanze","/beetkarte":"Beetkarte","/tagebuch":"Tagebuch","/einstellungen":"Einstellungen"};
+  var titleEl=document.getElementById("topbarTitle");
+  if(titles[hash])titleEl.innerHTML=titles[hash];
+  else if(hash.indexOf("/pflanzen/")===0&&hash.indexOf("/bearbeiten")>0)titleEl.textContent="Bearbeiten";
+  else if(hash.indexOf("/pflanzen/")===0)titleEl.textContent="Pflanze";
+  closeDrawer();window.scrollTo(0,0);
+}
+
+window.addEventListener("hashchange",route);
+
+function openDrawer(){document.getElementById("drawer").className="drawer open";document.getElementById("scrim").className="drawer-scrim open";}
+function closeDrawer(){document.getElementById("drawer").className="drawer";document.getElementById("scrim").className="drawer-scrim";}
+
+function buildDrawer(){
+  var nav=document.getElementById("drawerNav");clear(nav);
+  for(var i=0;i<NAV_ITEMS.length;i++){
+    var item=NAV_ITEMS[i];
+    nav.appendChild(el("a",{"class":"drawer__item",href:item.hash,"data-hash":item.hash.replace("#","")},[el("span",{"class":"ico"},item.icon),el("span",null,item.label)]));
+  }
+  nav.appendChild(el("div",{style:"height:1px;background:var(--c-line);margin:8px 0"}));
+  var logoutBtn=el("button",{"class":"drawer__item drawer__item--danger"},[el("span",{"class":"ico"},"X"),el("span",null,"Abmelden")]);
+  logoutBtn.addEventListener("click",function(){
+    confirmModal({title:"Abmelden?",text:"Du wirst ausgeloggt.",confirmLabel:"Abmelden",danger:true,onConfirm:function(){signOut(auth).then(function(){state.user=null;state.pflanzen=[];state.tagebuch=[];state.wizardDone=false;});}});
+  });
+  nav.appendChild(logoutBtn);
+}
+
+document.getElementById("btnMenu").addEventListener("click",openDrawer);
+document.getElementById("scrim").addEventListener("click",closeDrawer);
+
+// ================================================================
+// VIEWS
+// ================================================================
+
+
+// ================================================================
+// WETTER + FROSTWARNUNG (Schritte 7+8)
+// ================================================================
+
+var wetterCache = { data: null, timestamp: 0 };
+var WETTER_CACHE_MS = 60 * 60 * 1000; // 1 Stunde
+
+// WMO weather_code → Emoji + Beschreibung (§10)
+function wetterInfo(code) {
+  if (code === 0) return { emoji: "☀️", desc: "Klarer Himmel" };
+  if (code <= 2) return { emoji: "🌤", desc: "Teilweise bewölkt" };
+  if (code === 3) return { emoji: "☁️", desc: "Bedeckt" };
+  if (code <= 49) return { emoji: "🌫", desc: "Nebel" };
+  if (code <= 59) return { emoji: "🌦", desc: "Nieselregen" };
+  if (code <= 69) return { emoji: "🌧", desc: "Regen" };
+  if (code <= 79) return { emoji: "❄️", desc: "Schneefall" };
+  if (code <= 84) return { emoji: "🌧", desc: "Schauer" };
+  if (code <= 94) return { emoji: "⛈", desc: "Gewitter" };
+  return { emoji: "⛈", desc: "Starkes Gewitter" };
+}
+
+function ladeWetter(onDone) {
+  var jetzt = Date.now();
+  if (wetterCache.data && (jetzt - wetterCache.timestamp) < WETTER_CACHE_MS) {
+    onDone(null, wetterCache.data);
+    return;
+  }
+  var lat = state.einstellungen.standort.lat;
+  var lon = state.einstellungen.standort.lon;
+  var url = "https://api.open-meteo.com/v1/forecast"
+    + "?latitude=" + lat
+    + "&longitude=" + lon
+    + "&current=temperature_2m,precipitation,weather_code"
+    + "&daily=temperature_2m_min,temperature_2m_max,precipitation_sum"
+    + "&timezone=auto"
+    + "&forecast_days=7";
+  fetch(url)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      wetterCache.data = data;
+      wetterCache.timestamp = Date.now();
+      onDone(null, data);
+    })
+    .catch(function(err) {
+      onDone(err, null);
+    });
+}
+
+// Frostwarnung: nächste 7 Tage, min < 2°C, nur winterhart===false (§8)
+function pruefeFromstwarnung(wetterData) {
+  if (!wetterData || !wetterData.daily) return null;
+  var mins = wetterData.daily.temperature_2m_min;
+  var dates = wetterData.daily.time;
+  var nichtWinterhart = state.pflanzen.filter(function(p) { return p.winterhart === false; });
+  if (nichtWinterhart.length === 0) return null;
+  var frostTage = [];
+  for (var i = 0; i < mins.length; i++) {
+    if (mins[i] < 2) {
+      frostTage.push({ datum: dates[i], min: mins[i] });
+    }
+  }
+  if (frostTage.length === 0) return null;
+  return { tage: frostTage, pflanzen: nichtWinterhart };
+}
+
+function formatFrostDatum(iso) {
+  // iso = "2026-05-25"
+  var p = iso.split("-");
+  return p[2] + "." + p[1] + ".";
+}
+
+function renderHome(){
+  var v=document.getElementById("view");clear(v);
+  var h=new Date().getHours();
+  var gruss=h<11?"Guten Morgen":h<18?"Guten Tag":"Guten Abend";
+  var datumStr;try{datumStr=new Date().toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"});}catch(e){datumStr=new Date().toDateString();}
+
+  v.appendChild(el("section",{"class":"hero"},[
+    el("div",{"class":"hero__greeting"},gruss+"."),
+    el("div",{"class":"hero__date"},datumStr)
+  ]));
+
+  // Wetter-Bereich: erst Platzhalter, dann nach Laden aktualisieren
+  v.appendChild(el("div",{"class":"section-title"},"Heute in "+state.einstellungen.standort.name));
+  var wetterCard = el("div",{"class":"card"});
+  wetterCard.appendChild(el("div",{"class":"weather-card__loading"},"Wetterdaten laden..."));
+  v.appendChild(wetterCard);
+
+  // Hinweis-Bereich: wird nach Wetter-Laden befüllt
+  var hinweisBereich = el("div");
+  v.appendChild(hinweisBereich);
+
+  v.appendChild(el("div",{"class":"section-title"},"Schnellzugriff"));
+  var grid=el("div",{"class":"plant-grid"});
+  grid.appendChild(navCard("Pflanzen",state.pflanzen.length+" angelegt","#/pflanzen"));
+  grid.appendChild(navCard("Beetkarte","L-Form, 7,5 m x 0,6 m","#/beetkarte"));
+  grid.appendChild(navCard("Tagebuch",state.tagebuch.length+" Eintraege","#/tagebuch"));
+  v.appendChild(grid);
+
+  // Wetter asynchron laden
+  ladeWetter(function(err, data) {
+    // Prüfen ob wir noch auf der Startseite sind
+    if (location.hash.replace(/^#/,"") !== "/" && location.hash !== "") return;
+
+    clear(wetterCard);
+    if (err || !data || !data.current) {
+      wetterCard.appendChild(el("div",{"class":"weather-card__loading"},"Wetterdaten nicht verfuegbar."));
+      return;
+    }
+
+    var cur = data.current;
+    var daily = data.daily;
+    var temp = Math.round(cur.temperature_2m);
+    var info = wetterInfo(cur.weather_code);
+    var tMin = daily && daily.temperature_2m_min ? Math.round(daily.temperature_2m_min[0]) : null;
+    var tMax = daily && daily.temperature_2m_max ? Math.round(daily.temperature_2m_max[0]) : null;
+
+    var details = el("div",{"class":"weather-card__details"});
+    details.appendChild(el("div",{"class":"weather-card__desc"},info.desc));
+    if (tMin !== null && tMax !== null) {
+      details.appendChild(el("div",{"class":"weather-card__minmax"},"Min "+tMin+"° / Max "+tMax+"°"));
+    }
+
+    wetterCard.appendChild(el("div",{"class":"weather-card"},[
+      el("div",{"class":"weather-card__icon"},info.emoji),
+      el("div",{"class":"weather-card__temp"},temp+"°"),
+      details
+    ]));
+
+    // Frostwarnung (§8)
+    clear(hinweisBereich);
+    var frost = pruefeFromstwarnung(data);
+    if (frost) {
+      var pflanzenNamen = frost.pflanzen.map(function(p){return p.name;}).join(", ");
+      var erstFrost = frost.tage[0];
+      var warnText = "Frost am "+formatFrostDatum(erstFrost.datum)+" ("+erstFrost.min+"°C): "+pflanzenNamen+" schuetzen.";
+      if (frost.tage.length > 1) {
+        warnText += " ("+frost.tage.length+" Frosttage in den naechsten 7 Tagen)";
+      }
+      hinweisBereich.appendChild(el("div",{"class":"section-title"},"Hinweise"));
+      hinweisBereich.appendChild(el("div",{"class":"frost-banner"},[
+        el("strong",null,"Achtung Frost: "),
+        warnText
+      ]));
+    }
+  });
+}
+
+function navCard(name,meta,href){
+  return el("a",{"class":"plant-card",href:href},[
+    el("div",{"class":"plant-card__emoji"},name.charAt(0)),
+    el("div",{"class":"plant-card__body"},[el("div",{"class":"plant-card__name"},name),el("div",{"class":"plant-card__meta"},meta)]),
+    el("span",{"class":"plant-card__chev"},">")
+  ]);
+}
+
+// ---- Pflanzenliste ----
+function renderPflanzenListe(){
+  var v=document.getElementById("view");clear(v);
+  var searchInput=el("input",{type:"search",placeholder:"Pflanze suchen...",value:state.suchtext,autocomplete:"off",autocapitalize:"off",spellcheck:"false"});
+  searchInput.addEventListener("input",function(e){state.suchtext=e.target.value;renderList();});
+  v.appendChild(el("div",{"class":"search"},[el("span",{"class":"search-ico"},"?"),searchInput]));
+  var listContainer=el("div",{"class":"plant-grid"});v.appendChild(listContainer);
+  function renderList(){
+    clear(listContainer);
+    var q=state.suchtext.trim().toLowerCase();
+    var liste=state.pflanzen.slice();
+    if(q){var f=[];for(var i=0;i<liste.length;i++){var p=liste[i];if((p.name&&p.name.toLowerCase().indexOf(q)>=0)||(p.lateinisch&&p.lateinisch.toLowerCase().indexOf(q)>=0)||(p.kategorie&&p.kategorie.toLowerCase().indexOf(q)>=0))f.push(p);}liste=f;}
+    liste.sort(function(a,b){var an=(a.name||"").toLowerCase(),bn=(b.name||"").toLowerCase();return an<bn?-1:an>bn?1:0;});
+    if(liste.length===0){listContainer.appendChild(el("div",{"class":"empty card"},[el("h3",null,state.pflanzen.length===0?"Noch keine Pflanzen":"Keine Treffer"),el("p",null,state.pflanzen.length===0?"Tippe auf das Plus zum Anlegen.":"Nichts gefunden.")]));return;}
+    for(var j=0;j<liste.length;j++){
+      var pl=liste[j];
+      listContainer.appendChild(el("a",{"class":"plant-card",href:"#/pflanzen/"+pl.id},[
+        el("div",{"class":"plant-card__emoji"},pl.emoji||"*"),
+        el("div",{"class":"plant-card__body"},[el("div",{"class":"plant-card__name"},pl.name),el("div",{"class":"plant-card__meta"},[pl.lateinisch,pl.kategorie].filter(Boolean).join(" - "))]),
+        el("span",{"class":"plant-card__chev"},">")
+      ]));
+    }
+  }
+  renderList();
+}
+
+// ---- Pflanze Detail (mit Tagebuch-Sektion + BeetkarteMini) ----
+function renderPflanzeDetail(id){
+  var v=document.getElementById("view");clear(v);
+  var p=null;for(var i=0;i<state.pflanzen.length;i++)if(state.pflanzen[i].id===id){p=state.pflanzen[i];break;}
+  if(!p){v.appendChild(el("div",{"class":"placeholder"},[el("h2",null,"Nicht gefunden"),el("a",{"class":"btn",href:"#/pflanzen"},"Zurueck")]));return;}
+
+  // Zurueck-Button
+  var backBtn = el("button",{"class":"btn btn--ghost",style:"margin-bottom:var(--s-3);"},"< Zurueck");
+  backBtn.addEventListener("click", function(){ history.back(); });
+  v.appendChild(backBtn);
+
+  // Kopf
+  v.appendChild(el("div",{"class":"detail-head"},[
+    el("div",{"class":"detail-head__emoji"},p.emoji||"*"),
+    el("div",{"class":"detail-head__title"},[el("h1",null,p.name),p.lateinisch?el("em",null,p.lateinisch):null])
+  ]));
+
+  // Eigenschaften
+  v.appendChild(el("div",{"class":"section-title"},"Eigenschaften"));
+  v.appendChild(el("div",{"class":"card"},[el("ul",{"class":"props"},[
+    propLi("Kategorie",p.kategorie),propLi("Standort",p.standort),propLi("Wasserbedarf",p.wasserbedarf),
+    propLi("Wuchshoehe",p.wuchshoehe),propLi("Winterhart",p.winterhart===true?"Ja":p.winterhart===false?"Nein":null),
+    propLi("Angelegt am",formatDatum(p.anlegedatum))
+  ])]));
+
+  // Zeiten
+  if(p.aussaatzeit||p.pflanzzeit||p.bluetezeit||p.erntezeit){
+    v.appendChild(el("div",{"class":"section-title"},"Zeiten"));
+    v.appendChild(el("div",{"class":"card"},[el("ul",{"class":"props"},[
+      zeitLi("Aussaat",p.aussaatzeit,p.aussaatzeit&&p.aussaatzeit.typ),
+      zeitLi("Pflanzung",p.pflanzzeit,null),zeitLi("Bluete",p.bluetezeit,null),zeitLi("Ernte",p.erntezeit,null)
+    ])]));
+  }
+
+  // Pflege
+  v.appendChild(el("div",{"class":"section-title"},"Pflege"));
+  v.appendChild(el("div",{"class":"card"},[p.pflege?el("div",{"class":"pflege-text"},p.pflege):el("div",{"class":"pflege-text empty"},"Keine Hinweise hinterlegt.")]));
+
+  // Frost
+  if(p.frostHinweis){v.appendChild(el("div",{"class":"section-title"},"Frost"));v.appendChild(el("div",{"class":"card"},[el("div",{"class":"pflege-text"},p.frostHinweis)]));}
+
+  // Krankheiten & Schaedlinge
+  var hk=p.krankheiten&&p.krankheiten.length,hs=p.schaedlinge&&p.schaedlinge.length;
+  if(hk||hs){
+    v.appendChild(el("div",{"class":"section-title"},"Krankheiten & Schaedlinge"));
+    var box=el("div",{"class":"card"});
+    if(hk){var t1=el("div",{"class":"tags"});for(var k1=0;k1<p.krankheiten.length;k1++)t1.appendChild(el("span",{"class":"tag"},p.krankheiten[k1]));box.appendChild(el("div",{style:"margin-bottom:12px"},[el("div",{"class":"field-hint",style:"margin-bottom:6px"},"Krankheiten"),t1]));}
+    if(hs){var t2=el("div",{"class":"tags"});for(var k2=0;k2<p.schaedlinge.length;k2++)t2.appendChild(el("span",{"class":"tag"},p.schaedlinge[k2]));box.appendChild(el("div",null,[el("div",{"class":"field-hint",style:"margin-bottom:6px"},"Schaedlinge"),t2]));}
+    v.appendChild(box);
+  }
+
+  // ---- BeetkarteMini (§4) ----
+  v.appendChild(el("div",{"class":"section-title"},"Beetkarte"));
+  var miniBox = el("div",{"class":"card"});
+  renderBeetkarteMini(miniBox, p.id);
+  v.appendChild(miniBox);
+
+  // ---- Tagebuch-Sektion (§4: Tagebuch – nur Eintraege dieser Pflanze) ----
+  v.appendChild(el("div",{"class":"section-title"},"Tagebuch"));
+  var eintraege=state.tagebuch.filter(function(e){return e.pflanzeId===p.id;});
+  // Absteigende Sortierung nach Datum (§14)
+  eintraege.sort(function(a,b){return a.datum<b.datum?1:a.datum>b.datum?-1:0;});
+
+  var tagebuchBox=el("div",{"class":"card"});
+  var addBtn=el("button",{"class":"btn btn--sm btn--ghost",style:"margin-bottom:var(--s-3);width:100%"},"+ Eintrag hinzufuegen");
+  addBtn.addEventListener("click",function(){openTagebuchForm(p.id,p.name);});
+  tagebuchBox.appendChild(addBtn);
+
+  if(eintraege.length===0){
+    tagebuchBox.appendChild(el("div",{style:"text-align:center;padding:var(--s-4);color:var(--c-ink-mute);font-size:14px"},"Noch keine Eintraege fuer diese Pflanze."));
+  } else {
+    var list=el("div");
+    for(var ei=0;ei<eintraege.length;ei++){
+      list.appendChild(renderTagebuchEintrag(eintraege[ei],tagebuchBox,list,p));
+    }
+    tagebuchBox.appendChild(list);
+  }
+  v.appendChild(tagebuchBox);
+
+  // Aktionen
+  var delFn=function(){confirmModal({title:"Pflanze loeschen?",text:"Beetpositionen werden entfernt. Tagebucheintraege bleiben erhalten.",confirmLabel:"Loeschen",danger:true,onConfirm:function(){
+    var pid=p.id;
+    state.pflanzen=state.pflanzen.filter(function(x){return x.id!==pid;});
+    state.beetpositionen=state.beetpositionen.filter(function(b){return b.pflanzeId!==pid;});
+    fsDeletePflanze(pid,function(){ toast("Pflanze geloescht"); location.hash="#/pflanzen"; });
+  }});};
+  v.appendChild(el("div",{"class":"detail-actions"},[
+    el("a",{"class":"btn btn--ghost",href:"#/pflanzen/"+p.id+"/bearbeiten",style:"flex:1"},"Bearbeiten"),
+    el("button",{"class":"btn btn--danger",style:"flex:1",onclick:delFn},"Loeschen")
+  ]));
+}
+
+// ---- Tagebucheintrag rendern (wiederverwendbar) ----
+function renderTagebuchEintrag(eintrag, containerToRefresh, listEl, pflanze){
+  var div=el("div",{"class":"tagebuch-eintrag"});
+  var header=el("div",{"class":"tagebuch-eintrag__header"});
+  header.appendChild(el("span",{"class":"tagebuch-eintrag__datum"},formatDatum(eintrag.datum)));
+  var actions=el("div",{"class":"tagebuch-eintrag__actions"});
+  var editBtn=el("button",{"class":"link-btn"},"Bearbeiten");
+  var delBtn=el("button",{"class":"link-btn link-btn--danger"},"Loeschen");
+  editBtn.addEventListener("click",function(){
+    var pflanzeId=pflanze?pflanze.id:null;
+    var pflanzenName=pflanze?pflanze.name:null;
+    openTagebuchForm(pflanzeId,pflanzenName,eintrag);
+  });
+  delBtn.addEventListener("click",function(){
+    confirmModal({title:"Eintrag loeschen?",confirmLabel:"Loeschen",danger:true,onConfirm:function(){
+      var delId=eintrag.id;
+      state.tagebuch=state.tagebuch.filter(function(x){return x.id!==delId;});
+      fsDeleteTagebuch(delId,function(){
+        toast("Eintrag geloescht");
+        if(pflanze)renderPflanzeDetail(pflanze.id);else renderTagebuchGesamt();
+      });
+    }});
+  });
+  actions.appendChild(editBtn);actions.appendChild(delBtn);
+  header.appendChild(actions);div.appendChild(header);
+  div.appendChild(el("div",{"class":"tagebuch-eintrag__text"},eintrag.text||""));
+  if(eintrag.fotoUrl)div.appendChild(el("img",{"class":"tagebuch-eintrag__foto",src:eintrag.fotoUrl,alt:"Foto"}));
+  return div;
+}
+
+// ---- Tagebuch-Formular (Modal) ----
+// pflanzeId/pflanzenName: Pflanzenzuordnung (read-only beim Bearbeiten laut §7.1)
+// eintrag: null = neu anlegen, sonst bearbeiten
+function openTagebuchForm(pflanzeId, pflanzenName, eintrag){
+  var isEdit=!!eintrag;
+  var root=document.getElementById("modalRoot");clear(root);
+  function close(){clear(root);}
+
+  var draft={
+    id:isEdit?eintrag.id:uuid(),
+    pflanzeId:isEdit?eintrag.pflanzeId:pflanzeId,
+    pflanzenName:isEdit?eintrag.pflanzenName:pflanzenName,
+    datum:isEdit?eintrag.datum:heute(),
+    text:isEdit?eintrag.text:"",
+    fotoUrl:isEdit?eintrag.fotoUrl:null
+  };
+
+  var datumInput=el("input",{"class":"auth-input",type:"date",value:draft.datum,style:"margin-bottom:0"});
+  datumInput.addEventListener("change",function(e){draft.datum=e.target.value;});
+
+  var textArea=el("textarea",{style:"width:100%;padding:12px;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:var(--c-bg-card);color:var(--c-ink);outline:none;min-height:100px;resize:vertical;margin-top:var(--s-2);font-size:16px",placeholder:"Was hast du heute im Garten gemacht?"});
+  textArea.value=draft.text;
+  textArea.addEventListener("input",function(e){draft.text=e.target.value;});
+
+  // Pflanzenzuordnung (read-only beim Bearbeiten, §7.1)
+  var zuordnungDiv=null;
+  if(draft.pflanzenName){
+    zuordnungDiv=el("div",{style:"font-size:13px;color:var(--c-ink-mute);margin-bottom:var(--s-2)"},"Pflanze: "+draft.pflanzenName+(isEdit?" (nicht aenderbar)":""));
+  }
+
+  // Foto: Platzhalter – Upload kommt in Schritt 5
+  var fotoHint=el("div",{style:"font-size:12px;color:var(--c-ink-mute);margin-top:var(--s-2)"},"Foto-Upload folgt in Schritt 5.");
+
+  var saveBtn=el("button",{"class":"btn",style:"flex:1"},isEdit?"Speichern":"Anlegen");
+  saveBtn.addEventListener("click",function(){
+    if(!draft.text.trim()){toast("Bitte einen Text eingeben.");return;}
+    if(!draft.datum){toast("Bitte ein Datum waehlen.");return;}
+    if(isEdit){
+      for(var i=0;i<state.tagebuch.length;i++) if(state.tagebuch[i].id===draft.id){state.tagebuch[i]=draft;break;}
+      fsSetTagebuch(draft,function(){
+        toast("Eintrag gespeichert");
+        close();
+        var currentHash=location.hash.replace(/^#/,"");
+        if(currentHash.indexOf("/pflanzen/")===0&&draft.pflanzeId) renderPflanzeDetail(draft.pflanzeId);
+        else renderTagebuchGesamt();
+      });
+    } else {
+      state.tagebuch.push(draft);
+      fsSetTagebuch(draft,function(){
+        toast("Eintrag angelegt");
+        close();
+        var currentHash=location.hash.replace(/^#/,"");
+        if(currentHash.indexOf("/pflanzen/")===0&&draft.pflanzeId) renderPflanzeDetail(draft.pflanzeId);
+        else renderTagebuchGesamt();
+      });
+    }
+  });
+
+  var cancelBtn=el("button",{"class":"btn btn--ghost",style:"flex:1"},"Abbrechen");
+  cancelBtn.addEventListener("click",close);
+
+  var scrim=el("div",{"class":"modal-scrim"});
+  scrim.addEventListener("click",function(e){if(e.target===scrim)close();});
+  var modalChildren=[el("h2",null,isEdit?"Eintrag bearbeiten":"Neuer Eintrag")];
+  if(zuordnungDiv)modalChildren.push(zuordnungDiv);
+  modalChildren.push(el("div",{"class":"field"},[el("label",null,"Datum"),datumInput]));
+  modalChildren.push(el("div",{"class":"field"},[el("label",null,"Text"),textArea]));
+  modalChildren.push(fotoHint);
+  modalChildren.push(el("div",{"class":"modal__actions",style:"margin-top:var(--s-4)"},[cancelBtn,saveBtn]));
+  scrim.appendChild(el("div",{"class":"modal"},modalChildren));
+  root.appendChild(scrim);
+}
+
+// ---- Tagebuch Gesamt-Ansicht ----
+function renderTagebuchGesamt(){
+  var v=document.getElementById("view");clear(v);
+  var eintraege=state.tagebuch.slice();
+  eintraege.sort(function(a,b){return a.datum<b.datum?1:a.datum>b.datum?-1:0;});
+  v.appendChild(el("div",{"class":"section-title"},"Alle Eintraege"));
+  if(eintraege.length===0){
+    v.appendChild(el("div",{"class":"empty card"},[el("h3",null,"Noch keine Eintraege"),el("p",null,"Tippe auf das Plus, um deinen ersten Garteneintrag anzulegen.")]));
+    return;
+  }
+  var list=el("div",{"class":"card"});
+  for(var i=0;i<eintraege.length;i++){
+    var e=eintraege[i];
+    // Pflanze finden fuer den Kontext
+    var pfl=null;if(e.pflanzeId){for(var j=0;j<state.pflanzen.length;j++)if(state.pflanzen[j].id===e.pflanzeId){pfl=state.pflanzen[j];break;}}
+    var div=el("div",{"class":"tagebuch-eintrag"});
+    var header=el("div",{"class":"tagebuch-eintrag__header"});
+    var datumPflanze=formatDatum(e.datum)+(e.pflanzenName?" – "+e.pflanzenName:"");
+    header.appendChild(el("span",{"class":"tagebuch-eintrag__datum"},datumPflanze));
+    var actions=el("div",{"class":"tagebuch-eintrag__actions"});
+    var editBtn=el("button",{"class":"link-btn"},"Bearbeiten");
+    var delBtn=el("button",{"class":"link-btn link-btn--danger"},"Loeschen");
+    (function(eintrag,pflanze){
+      editBtn.addEventListener("click",function(){openTagebuchForm(eintrag.pflanzeId,eintrag.pflanzenName,eintrag);});
+      delBtn.addEventListener("click",function(){
+        confirmModal({title:"Eintrag loeschen?",confirmLabel:"Loeschen",danger:true,onConfirm:function(){
+          var delId2=eintrag.id;
+          state.tagebuch=state.tagebuch.filter(function(x){return x.id!==delId2;});
+          fsDeleteTagebuch(delId2,function(){ toast("Eintrag geloescht"); renderTagebuchGesamt(); });
+        }});
+      });
+    })(e,pfl);
+    actions.appendChild(editBtn);actions.appendChild(delBtn);header.appendChild(actions);
+    div.appendChild(header);
+    div.appendChild(el("div",{"class":"tagebuch-eintrag__text"},e.text||""));
+    if(e.fotoUrl)div.appendChild(el("img",{"class":"tagebuch-eintrag__foto",src:e.fotoUrl,alt:"Foto"}));
+    list.appendChild(div);
+  }
+  v.appendChild(list);
+}
+
+// ---- Einstellungen ----
+function renderEinstellungen(){
+  var v=document.getElementById("view");clear(v);
+  var email=(state.user&&state.user.email)?state.user.email:"Unbekannt";
+  v.appendChild(el("div",{"class":"section-title"},"Konto"));
+  v.appendChild(el("div",{"class":"card"},[el("ul",{"class":"props"},[
+    propLi("E-Mail",email),
+    propLi("Angemeldet seit",state.user&&state.user.metadata&&state.user.metadata.creationTime?new Date(state.user.metadata.creationTime).toLocaleDateString("de-DE"):"-")
+  ])]));
+  v.appendChild(el("div",{"class":"section-title"},"Standort"));
+  var standort=state.einstellungen.standort;
+  v.appendChild(el("div",{"class":"card"},[
+    el("ul",{"class":"props"},[
+      propLi("Ort",standort.name),
+      propLi("Koordinaten",standort.lat.toFixed(4)+" N, "+standort.lon.toFixed(4)+" E")
+    ]),
+    el("button",{"class":"btn btn--ghost btn--sm",style:"margin-top:var(--s-3);width:100%",onclick:function(){
+      state.wizardDone=false;
+      document.getElementById("authScreen").style.display="flex";
+      document.getElementById("app").style.display="none";
+      showLocationWizard();
+    }},"Standort aendern")
+  ]));
+  v.appendChild(el("div",{"class":"section-title"},"Weitere Einstellungen"));
+  v.appendChild(el("div",{"class":"card"},[el("p",{style:"color:var(--c-ink-mute);font-size:14px;margin:0"},"API-Key fuer Claude-Auto-Befuellung kommt in Schritt 9.")]));
+  var logoutBtn=el("button",{"class":"btn btn--danger",style:"margin-top:var(--s-4);width:100%"},"Abmelden");
+  logoutBtn.addEventListener("click",function(){confirmModal({title:"Abmelden?",text:"Du wirst ausgeloggt.",confirmLabel:"Abmelden",danger:true,onConfirm:function(){signOut(auth);}});});
+  v.appendChild(logoutBtn);
+}
+
+// ---- Pflanze Form ----
+function renderPflanzeForm(id){
+  var v=document.getElementById("view");clear(v);
+  var isEdit=!!id,existing=null;
+  if(isEdit){for(var i=0;i<state.pflanzen.length;i++)if(state.pflanzen[i].id===id){existing=state.pflanzen[i];break;}
+    if(!existing){v.appendChild(el("div",{"class":"placeholder"},[el("h2",null,"Nicht gefunden")]));return;}}
+  var draft=existing?JSON.parse(JSON.stringify(existing)):{
+    id:uuid(),schemaVersion:1,anlegedatum:heute(),name:"",lateinisch:"",kategorie:null,emoji:"",
+    wasserbedarf:null,standort:null,wuchshoehe:"",
+    aussaatzeit:{von:"",bis:"",typ:null},pflanzzeit:{von:"",bis:""},bluetezeit:{von:"",bis:""},erntezeit:{von:"",bis:""},
+    winterhart:null,frostHinweis:"",krankheiten:[],schaedlinge:[],pflege:""
+  };
+  var form=el("form",{"class":"form"});form.addEventListener("submit",function(e){e.preventDefault();save();});
+  if(!isEdit){form.appendChild(el("div",{"class":"banner-warn"},[el("strong",null,"Auto-Befuellung kommt in Schritt 9.")]));}
+  form.appendChild(field("Name *",inputBound(draft,"name",{autofocus:!isEdit})));
+  form.appendChild(field("Lateinischer Name",inputBound(draft,"lateinisch")));
+  form.appendChild(field("Emoji",inputBound(draft,"emoji",{maxlength:4})));
+  form.appendChild(field("Kategorie",selectBound(draft,"kategorie",KATEGORIEN)));
+  form.appendChild(field("Standort",selectBound(draft,"standort",STANDORTE)));
+  form.appendChild(field("Wasserbedarf",selectBound(draft,"wasserbedarf",WASSERBEDARF)));
+  form.appendChild(field("Wuchshoehe",inputBound(draft,"wuchshoehe",{placeholder:"z. B. 150cm"})));
+  form.appendChild(el("div",{"class":"field"},[el("label",null,"Winterhart"),tristate(draft,"winterhart")]));
+  form.appendChild(field("Frosthinweis",textareaBound(draft,"frostHinweis")));
+  form.appendChild(zeitFieldset("Aussaatzeit",draft,"aussaatzeit",true));
+  form.appendChild(zeitFieldset("Pflanzzeit",draft,"pflanzzeit",false));
+  form.appendChild(zeitFieldset("Bluetezeit",draft,"bluetezeit",false));
+  form.appendChild(zeitFieldset("Erntezeit",draft,"erntezeit",false));
+  form.appendChild(field("Krankheiten",csvInputBound(draft,"krankheiten"),"Mehrere durch Komma trennen"));
+  form.appendChild(field("Schaedlinge",csvInputBound(draft,"schaedlinge"),"Mehrere durch Komma trennen"));
+  form.appendChild(field("Pflege",textareaBound(draft,"pflege",{rows:5})));
+  var cancelBtn=el("button",{type:"button","class":"btn btn--ghost",style:"flex:1"},"Abbrechen");
+  cancelBtn.addEventListener("click",function(){history.back();});
+  form.appendChild(el("div",{"class":"detail-actions"},[cancelBtn,el("button",{type:"submit","class":"btn",style:"flex:1"},isEdit?"Speichern":"Anlegen")]));
+  v.appendChild(form);
+  function save(){
+    if(!draft.name||!draft.name.trim()){toast("Name ist Pflichtfeld");return;}
+    var keys=["aussaatzeit","pflanzzeit","bluetezeit","erntezeit"];
+    for(var i=0;i<keys.length;i++){var z=draft[keys[i]];if(z&&!z.von&&!z.bis&&!z.typ)draft[keys[i]]=null;}
+    if(isEdit){
+      for(var j=0;j<state.pflanzen.length;j++) if(state.pflanzen[j].id===id){state.pflanzen[j]=draft;break;}
+      fsSetPflanze(draft,function(){ toast("Gespeichert"); location.hash="#/pflanzen/"+draft.id; });
+    } else {
+      state.pflanzen.push(draft);
+      fsSetPflanze(draft,function(){ toast("Pflanze angelegt"); location.hash="#/pflanzen/"+draft.id; });
+    }
+  }
+}
+
+// ---- Form-Helfer ----
+function field(labelText,input,hint){return el("div",{"class":"field"},[el("label",null,labelText),input,hint?el("div",{"class":"field-hint"},hint):null]);}
+function inputBound(obj,key,opts){opts=opts||{};var inp=el("input",{type:"text",value:obj[key]||"",placeholder:opts.placeholder||"",maxlength:opts.maxlength,autocomplete:"off"});if(opts.autofocus)setTimeout(function(){try{inp.focus();}catch(e){}},50);inp.addEventListener("input",function(e){obj[key]=e.target.value;});return inp;}
+function textareaBound(obj,key,opts){opts=opts||{};var t=el("textarea",{rows:opts.rows||3,placeholder:opts.placeholder||""});t.value=obj[key]||"";t.addEventListener("input",function(e){obj[key]=e.target.value;});return t;}
+function selectBound(obj,key,options){var s=el("select");s.appendChild(el("option",{value:""},"-"));for(var i=0;i<options.length;i++){var o=options[i];s.appendChild(el("option",{value:o,selected:obj[key]===o},o));}s.addEventListener("change",function(e){obj[key]=e.target.value||null;});return s;}
+function monthSelect(obj,key,subkey){var cur=(obj[key]&&obj[key][subkey])||"";var s=el("select");s.appendChild(el("option",{value:""},"-"));for(var i=0;i<MONATE.length;i++){var m=MONATE[i];s.appendChild(el("option",{value:m,selected:cur===m},m));}s.addEventListener("change",function(e){if(!obj[key])obj[key]={von:"",bis:""};obj[key][subkey]=e.target.value;});return s;}
+function zeitFieldset(label,obj,key,withTyp){var cols=withTyp?"field-group--3":"";var children=[el("div",{"class":"field"},[el("label",null,"Von"),monthSelect(obj,key,"von")]),el("div",{"class":"field"},[el("label",null,"Bis"),monthSelect(obj,key,"bis")])];if(withTyp){var ts=el("select");ts.appendChild(el("option",{value:""},"-"));for(var i=0;i<AUSSAAT_TYP.length;i++){var t=AUSSAAT_TYP[i];ts.appendChild(el("option",{value:t,selected:obj[key]&&obj[key].typ===t},t));}ts.addEventListener("change",function(e){if(!obj[key])obj[key]={von:"",bis:""};obj[key].typ=e.target.value||null;});children.push(el("div",{"class":"field"},[el("label",null,"Art"),ts]));}return el("fieldset",null,[el("legend",null,label),el("div",{"class":"field-group "+cols},children)]);}
+function tristate(obj,key){var container=el("div",{"class":"tristate"});var states=[{v:true,l:"Ja"},{v:false,l:"Nein"},{v:null,l:"-"}];for(var i=0;i<states.length;i++){(function(s){var btn=el("button",{type:"button"},s.l);if(obj[key]===s.v)btn.className="active";btn.addEventListener("click",function(){obj[key]=s.v;var kids=container.children;for(var j=0;j<kids.length;j++)kids[j].className="";btn.className="active";});container.appendChild(btn);})(states[i]);}return container;}
+function csvInputBound(obj,key){var arr=obj[key]||[];var inp=el("input",{type:"text",value:arr.join(", "),placeholder:"z. B. Mehltau, Schnecken",autocomplete:"off"});inp.addEventListener("input",function(e){var raw=e.target.value.split(",");var out=[];for(var i=0;i<raw.length;i++){var s=raw[i].replace(/^\s+|\s+$/g,"");if(s)out.push(s);}obj[key]=out;});return inp;}
+function propLi(k,v){var hw=v!=null&&v!=="";return el("li",null,[el("span",{"class":"k"},k),el("span",{"class":"v"+(hw?"":' empty')},hw?String(v):"-")]);}
+function zeitLi(label,zeit,typ){if(!zeit||(!zeit.von&&!zeit.bis))return propLi(label,null);var von=zeit.von&&zeit.von!==""?zeit.von:null,bis=zeit.bis&&zeit.bis!==""?zeit.bis:null,text="";if(von&&bis&&von!==bis)text=von+" - "+bis;else if(von)text=von;else if(bis)text=bis;if(typ)text+=" ("+typ+")";return propLi(label,text||null);}
+
+// ================================================================
+// BEETKARTE (Schritt 4)
+// ================================================================
+
+// §5.1: L-Form: langer Schenkel 7.5m x 0.6m, kurzer Schenkel 1.0m x 0.6m (links unten)
+// Koordinatensystem: Ursprung oben links, x nach rechts, y nach unten
+// Relativer Raum: gesamte Bounding-Box = 7.5m breit, 1.6m hoch
+// Langer Schenkel: x=0..7.5, y=0..0.6  → rel: x=0..1, y=0..0.375
+// Kurzer Schenkel: x=0..0.6, y=0.6..1.6 → rel: x=0..0.08, y=0.375..1.0
+var BEET_W_M = 7.5;   // Breite Bounding-Box in Metern
+var BEET_H_M = 1.6;   // Höhe Bounding-Box (0.6 + 1.0)
+var BEET_LANG_H = 0.6 / BEET_H_M;  // 0.375 – relativer Anteil langer Schenkel
+var BEET_KURZ_W = 0.6 / BEET_W_M;  // 0.08  – relativer Anteil kurzer Schenkel Breite
+
+// Prüfe ob ein relativer Punkt (rx, ry) im L-Polygon liegt
+function punktImBeet(rx, ry) {
+  // Langer Schenkel: rx in [0,1], ry in [0, BEET_LANG_H]
+  if (ry >= 0 && ry <= BEET_LANG_H && rx >= 0 && rx <= 1) return true;
+  // Kurzer Schenkel: rx in [0, BEET_KURZ_W], ry in [BEET_LANG_H, 1]
+  if (ry > BEET_LANG_H && ry <= 1 && rx >= 0 && rx <= BEET_KURZ_W) return true;
+  return false;
+}
+
+// Nummerierung: aufsteigend nach anlegedatum (§14)
+function nummeriereBeetpositionen() {
+  var sorted = state.beetpositionen.slice().sort(function(a,b){
+    return a.anlegedatum < b.anlegedatum ? -1 : a.anlegedatum > b.anlegedatum ? 1 : 0;
+  });
+  // Nummer als Index+1 zuweisen (nicht persistent, nur Laufzeit)
+  var numMap = {};
+  for (var i = 0; i < sorted.length; i++) numMap[sorted[i].id] = i + 1;
+  return numMap;
+}
+
+// Legende: pro Pflanze alle Nummern, alphabetisch nach Pflanzenname (§14)
+function legendeErstellen(numMap) {
+  var map = {};
+  for (var i = 0; i < state.beetpositionen.length; i++) {
+    var bp = state.beetpositionen[i];
+    var pfl = null;
+    for (var j = 0; j < state.pflanzen.length; j++) if (state.pflanzen[j].id === bp.pflanzeId) { pfl = state.pflanzen[j]; break; }
+    var name = pfl ? pfl.name : "Unbekannt";
+    if (!map[bp.pflanzeId]) map[bp.pflanzeId] = { name: name, nummern: [] };
+    map[bp.pflanzeId].nummern.push(numMap[bp.id]);
+  }
+  var arr = [];
+  for (var pid in map) { if (Object.prototype.hasOwnProperty.call(map, pid)) arr.push(map[pid]); }
+  arr.sort(function(a,b){ return (a.name||"").localeCompare(b.name||"","de",{sensitivity:"base"}); });
+  arr.forEach(function(e){ e.nummern.sort(function(a,b){return a-b;}); });
+  return arr;
+}
+
+// SVG der Beetkarte erstellen
+// svgW: Pixelbreite des SVGs
+// moving: ID der zu verschiebenden Position (oder null)
+// onTap: callback(rx, ry) wenn auf freie Fläche getippt
+// onMarkerLongpress: callback(bp) bei Langdruck auf Marker
+function beetSVG(svgW, moving, onTap, onMarkerLongpress, filterPflanzeId) {
+  var svgH = Math.round(svgW * BEET_H_M / BEET_W_M);
+  var numMap = nummeriereBeetpositionen();
+
+  var svgNS = "http://www.w3.org/2000/svg";
+  var svg = document.createElementNS(svgNS, "svg");
+  svg.setAttribute("width", svgW);
+  svg.setAttribute("height", svgH);
+  svg.setAttribute("viewBox", "0 0 " + svgW + " " + svgH);
+  svg.setAttribute("class","beet-svg");
+
+  function relToSvg(rx, ry) { return { x: Math.round(rx * svgW), y: Math.round(ry * svgH) }; }
+  function svgToRel(sx, sy) { return { rx: sx / svgW, ry: sy / svgH }; }
+
+  // L-Form als einzelnes Polygon (keine Innenlinie an der Verbindungsstelle)
+  var pts = [
+    relToSvg(0, 0),
+    relToSvg(1, 0),
+    relToSvg(1, BEET_LANG_H),
+    relToSvg(BEET_KURZ_W, BEET_LANG_H),
+    relToSvg(BEET_KURZ_W, 1),
+    relToSvg(0, 1)
+  ];
+  var ptStr = pts.map(function(p){ return p.x+","+p.y; }).join(" ");
+  var polygon = document.createElementNS(svgNS, "polygon");
+  polygon.setAttribute("points", ptStr);
+  polygon.setAttribute("fill", "#e8f0e8");
+  polygon.setAttribute("stroke", "#3d5a3d");
+  polygon.setAttribute("stroke-width", "2");
+  polygon.setAttribute("stroke-linejoin", "round");
+  svg.appendChild(polygon);
+
+  // Tap auf Karte
+  var tapTimer = null;
+  svg.addEventListener("touchstart", function(e) {
+    var touch = e.touches[0];
+    var rect = svg.getBoundingClientRect();
+    var sx = touch.clientX - rect.left;
+    var sy = touch.clientY - rect.top;
+    var rel = svgToRel(sx, sy);
+    tapTimer = setTimeout(function() { tapTimer = null; }, 600); // verhindert Doppelauslösung
+    e.stopPropagation();
+  }, { passive: true });
+
+  svg.addEventListener("touchend", function(e) {
+    if (!tapTimer) return;
+    clearTimeout(tapTimer); tapTimer = null;
+    var touch = e.changedTouches[0];
+    var rect = svg.getBoundingClientRect();
+    var sx = touch.clientX - rect.left;
+    var sy = touch.clientY - rect.top;
+    var rel = svgToRel(sx, sy);
+    if (punktImBeet(rel.rx, rel.ry) && onTap) onTap(rel.rx, rel.ry);
+    e.preventDefault();
+  }, { passive: false });
+
+  // Click für Desktop-Test
+  svg.addEventListener("click", function(e) {
+    var rect = svg.getBoundingClientRect();
+    var rel = svgToRel(e.clientX - rect.left, e.clientY - rect.top);
+    if (punktImBeet(rel.rx, rel.ry) && onTap) onTap(rel.rx, rel.ry);
+  });
+
+  // Marker zeichnen
+  var positionen = state.beetpositionen.slice();
+  positionen.sort(function(a,b){ return a.anlegedatum < b.anlegedatum ? -1 : 1; });
+
+  for (var i = 0; i < positionen.length; i++) {
+    (function(bp) {
+      if (filterPflanzeId && bp.pflanzeId !== filterPflanzeId) return;
+      var num = numMap[bp.id];
+      var pos = relToSvg(bp.x, bp.y);
+      var g = document.createElementNS(svgNS, "g");
+      g.setAttribute("class", "beet-marker" + (moving === bp.id ? " moving" : ""));
+
+      var circle = document.createElementNS(svgNS, "circle");
+      circle.setAttribute("cx", pos.x); circle.setAttribute("cy", pos.y);
+      circle.setAttribute("r", "14");
+      g.appendChild(circle);
+
+      var text = document.createElementNS(svgNS, "text");
+      text.setAttribute("x", pos.x); text.setAttribute("y", pos.y);
+      text.textContent = String(num);
+      g.appendChild(text);
+
+      // Langdruck (500ms)
+      if (onMarkerLongpress) {
+        var pressTimer = null;
+        g.addEventListener("touchstart", function(e) {
+          e.stopPropagation();
+          pressTimer = setTimeout(function() { pressTimer = null; onMarkerLongpress(bp); }, 500);
+        }, { passive: true });
+        g.addEventListener("touchend", function(e) {
+          if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+          e.preventDefault();
+        }, { passive: false });
+        g.addEventListener("touchmove", function(e) {
+          if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+        }, { passive: true });
+        // Desktop: Rechtsklick oder Doppelklick als Langdruck-Ersatz
+        g.addEventListener("dblclick", function(e) { e.stopPropagation(); onMarkerLongpress(bp); });
+        g.addEventListener("contextmenu", function(e) { e.preventDefault(); e.stopPropagation(); onMarkerLongpress(bp); });
+      }
+      svg.appendChild(g);
+    })(positionen[i]);
+  }
+  return svg;
+}
+
+// ---- Action Sheet ----
+function actionSheet(title, actions) {
+  var root = document.getElementById("modalRoot"); clear(root);
+  function close() { clear(root); }
+  var scrim = el("div", {"class": "action-sheet-scrim"});
+  scrim.addEventListener("click", function(e) { if (e.target === scrim) close(); });
+  var sheet = el("div", {"class": "action-sheet"});
+  if (title) sheet.appendChild(el("div", {"class": "action-sheet__title"}, title));
+  for (var i = 0; i < actions.length; i++) {
+    (function(a) {
+      var btn = el("button", {"class": "action-sheet__btn" + (a.danger ? " action-sheet__btn--danger" : "")}, a.label);
+      btn.addEventListener("click", function() { close(); a.onSelect(); });
+      sheet.appendChild(btn);
+    })(actions[i]);
+  }
+  var cancelBtn = el("button", {"class": "action-sheet__cancel"}, "Abbrechen");
+  cancelBtn.addEventListener("click", close);
+  sheet.appendChild(cancelBtn);
+  scrim.appendChild(sheet);
+  root.appendChild(scrim);
+}
+
+// ---- Pflanzenwahl-Dialog ----
+function pflanzeWaehlen(onSelect) {
+  var root = document.getElementById("modalRoot"); clear(root);
+  function close() { clear(root); }
+  var scrim = el("div", {"class": "modal-scrim"});
+  scrim.addEventListener("click", function(e) { if (e.target === scrim) close(); });
+
+  var children = [el("h2", null, "Pflanze waehlen")];
+  if (state.pflanzen.length === 0) {
+    children.push(el("p", {style:"color:var(--c-ink-mute);font-size:14px"}, "Du hast noch keine Pflanzen angelegt. Bitte erst eine Pflanze hinzufuegen."));
+    children.push(el("div", {"class": "modal__actions"}, [
+      el("button", {"class": "btn btn--ghost", onclick: close}, "Schliessen")
+    ]));
+  } else {
+    var sorted = state.pflanzen.slice().sort(function(a,b){return (a.name||"").localeCompare(b.name||"","de",{sensitivity:"base"});});
+    var list = el("div", {style:"max-height:300px;overflow-y:auto;margin:var(--s-3) 0;"});
+    for (var i = 0; i < sorted.length; i++) {
+      (function(pfl) {
+        var btn = el("button", {"class": "action-sheet__btn"}, [
+          el("span", {style:"font-size:20px;margin-right:8px"}, pfl.emoji || "*"),
+          el("span", null, pfl.name)
+        ]);
+        btn.addEventListener("click", function() { close(); onSelect(pfl); });
+        list.appendChild(btn);
+      })(sorted[i]);
+    }
+    children.push(list);
+    children.push(el("button", {"class": "action-sheet__cancel"}, "Abbrechen"));
+    document.querySelector(".action-sheet__cancel");
+    var cancelBtn2 = children[children.length - 1];
+    cancelBtn2.addEventListener("click", close);
+  }
+  scrim.appendChild(el("div", {"class": "modal"}, children));
+  root.appendChild(scrim);
+}
+
+// ---- Beetkarte Hauptansicht ----
+var beetState = { moving: null }; // ID der zu verschiebenden Position
+
+function renderBeetkarte() {
+  var v = document.getElementById("view"); clear(v);
+  beetState.moving = null;
+  drawBeetkarte(v);
+}
+
+function drawBeetkarte(v) {
+  clear(v);
+  var numMap = nummeriereBeetpositionen();
+
+  // Hinweis wenn im Verschiebe-Modus
+  if (beetState.moving) {
+    v.appendChild(el("div", {"class": "beet-hint"}, "Tippe auf die neue Position fuer den Marker."));
+  }
+
+  // SVG
+  v.appendChild(el("div", {"class": "section-title"}, "Beet"));
+  var wrap = el("div", {"class": "beet-wrap card", style:"padding:var(--s-3);"});
+  var viewEl = document.getElementById("view");
+  var svgW = viewEl ? Math.max(viewEl.clientWidth - 40, 200) : 320;
+
+  var svg = beetSVG(svgW, beetState.moving,
+    // onTap: neue Position oder Verschieben
+    function(rx, ry) {
+      if (beetState.moving) {
+        // Verschieben: Position aktualisieren
+        var movedBp = null;
+        for (var i = 0; i < state.beetpositionen.length; i++) {
+          if (state.beetpositionen[i].id === beetState.moving) {
+            state.beetpositionen[i].x = rx;
+            state.beetpositionen[i].y = ry;
+            movedBp = state.beetpositionen[i];
+            break;
+          }
+        }
+        beetState.moving = null;
+        if (movedBp) fsSetBeetposition(movedBp, null);
+        toast("Position verschoben");
+        drawBeetkarte(v);
+      } else {
+        // Neue Position: Pflanzenwahl
+        pflanzeWaehlen(function(pfl) {
+          var newBp = {id:uuid(),pflanzeId:pfl.id,x:rx,y:ry,anlegedatum:heute()};
+          state.beetpositionen.push(newBp);
+          fsSetBeetposition(newBp,null);
+          toast(pfl.name + " platziert");
+          drawBeetkarte(v);
+        });
+      }
+    },
+    // onMarkerLongpress: Action Sheet
+    function(bp) {
+      var pfl = null;
+      for (var i = 0; i < state.pflanzen.length; i++) if (state.pflanzen[i].id === bp.pflanzeId) { pfl = state.pflanzen[i]; break; }
+      var num = numMap[bp.id];
+      var name = pfl ? pfl.name : "Position";
+      actionSheet(name + " (Nr. " + num + ")", [
+        { label: "Verschieben", danger: false, onSelect: function() {
+          beetState.moving = bp.id;
+          drawBeetkarte(v);
+        }},
+        { label: "Loeschen", danger: true, onSelect: function() {
+          confirmModal({ title: "Position loeschen?", text: name + " Nr. " + num + " wird entfernt.", confirmLabel: "Loeschen", danger: true, onConfirm: function() {
+            var delId = bp.id;
+            state.beetpositionen = state.beetpositionen.filter(function(b){ return b.id !== delId; });
+            fsDeleteBeetposition(delId, null);
+            toast("Position geloescht");
+            drawBeetkarte(v);
+          }});
+        }}
+      ]);
+    },
+    null // kein Filter: alle Positionen zeigen
+  );
+
+  wrap.appendChild(svg);
+  v.appendChild(wrap);
+
+  // Hinweis Tippen
+  if (!beetState.moving) {
+    v.appendChild(el("div", {style:"font-size:12px;color:var(--c-ink-mute);text-align:center;margin-top:var(--s-2);"}, "Tippe auf das Beet um eine Pflanze zu platzieren. Langdruck auf Marker zum Verschieben oder Loeschen."));
+  }
+
+  // Legende
+  var legende = legendeErstellen(numMap);
+  if (legende.length > 0) {
+    v.appendChild(el("div", {"class": "section-title"}, "Legende"));
+    var legendCard = el("div", {"class": "card"});
+    var ul = el("ul", {"class": "legende"});
+    for (var li = 0; li < legende.length; li++) {
+      var entry = legende[li];
+      var dot = el("div", {"class": "legende__dot"}, [el("span", null, "")]);
+      var row = el("li", null, [
+        dot,
+        el("span", {"class": "legende__name"}, entry.name),
+        el("span", {"class": "legende__nums"}, entry.nummern.join(", "))
+      ]);
+      ul.appendChild(row);
+    }
+    legendCard.appendChild(ul);
+    v.appendChild(legendCard);
+  } else if (!beetState.moving) {
+    v.appendChild(el("div", {"class": "section-title"}, "Legende"));
+    v.appendChild(el("div", {"class": "card"}, [el("p", {style:"color:var(--c-ink-mute);font-size:14px;margin:0"}, "Noch keine Pflanzen platziert.")]));
+  }
+}
+
+// ---- BeetkarteMini (in Pflanze-Detail) ----
+function renderBeetkarteMini(container, pflanzeId) {
+  var positionen = state.beetpositionen.filter(function(b){ return b.pflanzeId === pflanzeId; });
+  if (positionen.length === 0) {
+    container.appendChild(el("div", {"class": "beet-mini"}, "Noch keine Position im Beet. Tippe auf die Beetkarte um diese Pflanze zu platzieren."));
+    return;
+  }
+  var wrap = el("div", {"class": "beet-wrap"});
+  var viewEl2 = document.getElementById("view");
+  var svgW = viewEl2 ? Math.max(viewEl2.clientWidth - 64, 160) : 260;
+  // Readonly Mini: kein onTap, kein Langdruck
+  var svg = beetSVG(svgW, null, null, null, pflanzeId);
+  wrap.appendChild(svg);
+  container.appendChild(wrap);
+  var numMap = nummeriereBeetpositionen();
+  var nums = positionen.map(function(b){ return numMap[b.id]; }).sort(function(a,b){return a-b;});
+  container.appendChild(el("div", {style:"font-size:12px;color:var(--c-ink-mute);margin-top:var(--s-2);"}, "Position" + (nums.length > 1 ? "en" : "") + ": " + nums.join(", ")));
+}
+
+
+function renderPlaceholder(titel,hinweis){var v=document.getElementById("view");clear(v);v.appendChild(el("div",{"class":"placeholder card"},[el("h2",null,titel),el("p",null,hinweis),el("a",{"class":"btn btn--ghost",href:"#/",style:"margin-top:16px"},"Zur Startseite")]));}
+
+
+// Service Worker registrieren
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function() {
+    navigator.serviceWorker.register("/sw.js")
+      .then(function(reg) { console.log("SW registriert:", reg.scope); })
+      .catch(function(err) { console.log("SW Fehler:", err); });
+  });
+}
+</script>
+</body>
+</html>
