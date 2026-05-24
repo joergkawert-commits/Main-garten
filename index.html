@@ -1314,18 +1314,19 @@ function legendeErstellen(numMap) {
 // onTap: callback(rx, ry) wenn auf freie Fläche getippt
 // onMarkerLongpress: callback(bp) bei Langdruck auf Marker
 function beetSVG(svgW, moving, onTap, onMarkerLongpress, filterPflanzeId) {
-  var svgH = Math.round(svgW * 0.35);  // lesbare Höhe, nicht maßstäblich
+  var svgH = Math.round(svgW * 0.35);
+  var pad = 2;
   var numMap = nummeriereBeetpositionen();
 
   var svgNS = "http://www.w3.org/2000/svg";
   var svg = document.createElementNS(svgNS, "svg");
   svg.setAttribute("width", svgW);
-  svg.setAttribute("height", svgH);
-  svg.setAttribute("viewBox", "0 0 " + svgW + " " + svgH);
+  svg.setAttribute("height", svgH + pad * 2);
+  svg.setAttribute("viewBox", "0 0 " + svgW + " " + (svgH + pad * 2));
   svg.setAttribute("class","beet-svg");
 
-  function relToSvg(rx, ry) { return { x: Math.round(rx * svgW), y: Math.round(ry * svgH) }; }
-  function svgToRel(sx, sy) { return { rx: sx / svgW, ry: sy / svgH }; }
+  function relToSvg(rx, ry) { return { x: pad + Math.round(rx * (svgW - pad*2)), y: pad + Math.round(ry * svgH) }; }
+  function svgToRel(sx, sy) { return { rx: (sx-pad) / (svgW-pad*2), ry: (sy-pad) / svgH }; }
 
   // L-Form mit SVG clipPath - sauberste Lösung ohne Innenlinien
   // Schritt 1: clipPath definieren (L-Form)
@@ -1522,9 +1523,9 @@ function drawBeetkarte(v) {
 
   // SVG
   v.appendChild(el("div", {"class": "section-title"}, "Beet"));
-  var wrap = el("div", {"class": "beet-wrap card", style:"padding:var(--s-3);"});
+  var wrap = el("div", {"class": "beet-wrap card", style:"padding:var(--s-3);overflow:hidden;"});
   var viewEl = document.getElementById("view");
-  var svgW = viewEl ? Math.max(viewEl.clientWidth - 40, 200) : 320;
+  var svgW = viewEl ? Math.max(viewEl.clientWidth - 56, 200) : 280;
 
   var svg = beetSVG(svgW, beetState.moving,
     // onTap: neue Position oder Verschieben
