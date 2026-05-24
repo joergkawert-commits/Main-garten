@@ -46,7 +46,7 @@
   .auth-card h2{margin-bottom:var(--s-2);}
   .auth-card p{color:var(--c-ink-soft);font-size:15px;margin:0 0 var(--s-4);}
   .auth-input{width:100%;padding:14px;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:var(--c-bg);color:var(--c-ink);outline:none;margin-bottom:var(--s-3);box-sizing:border-box;}
-  .date-input{display:block;width:100%;max-width:100%;padding:12px;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:var(--c-bg-card);color:var(--c-ink);outline:none;box-sizing:border-box;font-size:16px;font-family:inherit;-webkit-appearance:none;appearance:none;}
+  .date-selects{display:grid;grid-template-columns:2fr 3fr 3fr;gap:8px;}
   .auth-input:focus{border-color:var(--c-leaf);}
   .auth-btn{width:100%;padding:14px;border-radius:var(--r-md);border:none;background:var(--c-leaf);color:white;font-weight:600;font-size:16px;cursor:pointer;}
   .auth-btn:active{transform:scale(0.98);}
@@ -1043,8 +1043,34 @@ function openTagebuchForm(pflanzeId, pflanzenName, eintrag){
     fotoUrl:isEdit?eintrag.fotoUrl:null
   };
 
-  var datumInput=el("input",{"class":"date-input",type:"date",value:draft.datum});
-  datumInput.addEventListener("change",function(e){draft.datum=e.target.value;});
+  // Datum als drei Dropdowns (Tag / Monat / Jahr) - iOS-Safari-sicher
+  var datumParts = (draft.datum||heute()).split("-");
+  var dYear=datumParts[0], dMonth=datumParts[1], dDay=datumParts[2];
+
+  function makeDatumDropdown(options, selected) {
+    var s = el("select",{"class":"field input"});
+    s.style.cssText = "padding:12px;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:var(--c-bg-card);color:var(--c-ink);outline:none;width:100%;font-size:16px;";
+    for(var i=0;i<options.length;i++) {
+      var o = el("option",{value:options[i].v, selected:options[i].v===selected},options[i].l);
+      s.appendChild(o);
+    }
+    return s;
+  }
+
+  var tagOpts=[];for(var d=1;d<=31;d++){var ds=String(d).length<2?"0"+d:String(d);tagOpts.push({v:ds,l:String(d)});}
+  var monOpts=[{v:"01",l:"Jan"},{v:"02",l:"Feb"},{v:"03",l:"Mär"},{v:"04",l:"Apr"},{v:"05",l:"Mai"},{v:"06",l:"Jun"},{v:"07",l:"Jul"},{v:"08",l:"Aug"},{v:"09",l:"Sep"},{v:"10",l:"Okt"},{v:"11",l:"Nov"},{v:"12",l:"Dez"}];
+  var jahrOpts=[];var jetzt=new Date().getFullYear();for(var y=jetzt-2;y<=jetzt+1;y++){jahrOpts.push({v:String(y),l:String(y)});}
+
+  var tagSel = makeDatumDropdown(tagOpts, dDay);
+  var monSel = makeDatumDropdown(monOpts, dMonth);
+  var jahrSel = makeDatumDropdown(jahrOpts, dYear);
+
+  function updateDatum(){draft.datum=jahrSel.value+"-"+monSel.value+"-"+tagSel.value;}
+  tagSel.addEventListener("change",updateDatum);
+  monSel.addEventListener("change",updateDatum);
+  jahrSel.addEventListener("change",updateDatum);
+
+  var datumInput = el("div",{"class":"date-selects"},[tagSel,monSel,jahrSel]);
 
   var textArea=el("textarea",{style:"width:100%;padding:12px;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:var(--c-bg-card);color:var(--c-ink);outline:none;min-height:100px;resize:vertical;margin-top:var(--s-2);font-size:16px",placeholder:"Was hast du heute im Garten gemacht?"});
   textArea.value=draft.text;
@@ -1090,7 +1116,7 @@ function openTagebuchForm(pflanzeId, pflanzenName, eintrag){
   scrim.addEventListener("click",function(e){if(e.target===scrim)close();});
   var modalChildren=[el("h2",null,isEdit?"Eintrag bearbeiten":"Neuer Eintrag")];
   if(zuordnungDiv)modalChildren.push(zuordnungDiv);
-  modalChildren.push(el("div",{"class":"field"},[el("label",null,"Datum"),el("div",{style:"overflow:hidden;width:100%;"},datumInput)]));
+  modalChildren.push(el("div",{"class":"field"},[el("label",null,"Datum"),datumInput]));
   modalChildren.push(el("div",{"class":"field"},[el("label",null,"Text"),textArea]));
   modalChildren.push(el("div",{"class":"modal__actions",style:"margin-top:var(--s-4)"},[cancelBtn,saveBtn]));
   scrim.appendChild(el("div",{"class":"modal"},modalChildren));
