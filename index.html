@@ -201,12 +201,12 @@
   .beet-svg{display:block;touch-action:none;cursor:crosshair;}
   .beet-rect{fill:#e8f0e8;stroke:#3d5a3d;stroke-width:2;}
   .beet-marker{cursor:pointer;}
-  .beet-marker circle{fill:#3d5a3d;stroke:white;stroke-width:2;}
+  .beet-marker circle{stroke:white;stroke-width:2;}
   .beet-marker.moving circle{fill:#b8612a;stroke:white;stroke-width:2;}
   .beet-marker text{fill:white;font-size:11px;font-weight:600;text-anchor:middle;dominant-baseline:central;pointer-events:none;}
   .beet-hint{background:var(--c-warn-bg);border:1px solid var(--c-warn-bd);color:var(--c-warn-ink);padding:var(--s-2) var(--s-3);border-radius:var(--r-md);font-size:13px;text-align:center;margin-bottom:var(--s-3);}
   .legende{list-style:none;padding:0;margin:0;}
-  .legende li{display:flex;align-items:center;gap:var(--s-2);padding:var(--s-2) 0;border-bottom:1px solid var(--c-line);font-size:14px;}
+  .legende li,.legende__link{display:flex;align-items:center;gap:var(--s-2);padding:var(--s-2) 0;border-bottom:1px solid var(--c-line);font-size:14px;}
   .legende li:last-child{border-bottom:none;}
   .legende__dot{width:20px;height:20px;border-radius:50%;background:var(--c-leaf);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
   .legende__dot span{font-size:9px;font-weight:700;color:white;}
@@ -351,11 +351,11 @@ function confirmModal(opts){
 }
 
 // ---- Konstanten ----
-var KATEGORIEN=["Gemuese","Kraeuter","Blumen","Straeucher","Obst","Sonstiges"];
+var KATEGORIEN=["Gemüse","Kräuter","Blumen","Sträucher","Obst","Sonstiges"];
 var WASSERBEDARF=["Gering","Mittel","Hoch"];
 var STANDORTE=["Sonnig","Halbschatten","Schatten"];
 var AUSSAAT_TYP=["Vorkultur","Direktsaat"];
-var MONATE=["Januar","Februar","Maerz","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+var MONATE=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
 
 // ---- State ----
 var state={
@@ -372,7 +372,7 @@ var state={
 // FIRESTORE CRUD (Schritt 6)
 // ================================================================
 
-// Hilfsfunktion: null-Werte aus Objekt entfernen fuer Firestore
+// Hilfsfunktion: null-Werte aus Objekt entfernen für Firestore
 function cleanForFirestore(obj) {
   var out = {};
   for (var k in obj) {
@@ -433,14 +433,14 @@ function fsSetPflanze(pflanze, onDone) {
     .catch(function(err){ toast("Speichern fehlgeschlagen."); console.error(err); if(onDone) onDone(); });
 }
 
-// Pflanze loeschen (inkl. Beetpositionen kaskadiert)
+// Pflanze löschen (inkl. Beetpositionen kaskadiert)
 function fsDeletePflanze(pflanzeId, onDone) {
   var bp = state.beetpositionen.filter(function(b){ return b.pflanzeId===pflanzeId; });
   var delPromises = bp.map(function(b){ return deleteDoc(docRef("beetpositionen",b.id)); });
   delPromises.push(deleteDoc(docRef("pflanzen",pflanzeId)));
   Promise.all(delPromises)
     .then(function(){ if(onDone) onDone(); })
-    .catch(function(err){ toast("Loeschen fehlgeschlagen."); console.error(err); if(onDone) onDone(); });
+    .catch(function(err){ toast("Löschen fehlgeschlagen."); console.error(err); if(onDone) onDone(); });
 }
 
 // Beetposition speichern
@@ -450,11 +450,11 @@ function fsSetBeetposition(bp, onDone) {
     .catch(function(err){ toast("Speichern fehlgeschlagen."); console.error(err); if(onDone) onDone(); });
 }
 
-// Beetposition loeschen
+// Beetposition löschen
 function fsDeleteBeetposition(bpId, onDone) {
   deleteDoc(docRef("beetpositionen",bpId))
     .then(function(){ if(onDone) onDone(); })
-    .catch(function(err){ toast("Loeschen fehlgeschlagen."); console.error(err); if(onDone) onDone(); });
+    .catch(function(err){ toast("Löschen fehlgeschlagen."); console.error(err); if(onDone) onDone(); });
 }
 
 // Tagebucheintrag speichern
@@ -464,11 +464,11 @@ function fsSetTagebuch(eintrag, onDone) {
     .catch(function(err){ toast("Speichern fehlgeschlagen."); console.error(err); if(onDone) onDone(); });
 }
 
-// Tagebucheintrag loeschen
+// Tagebucheintrag löschen
 function fsDeleteTagebuch(eintragId, onDone) {
   deleteDoc(docRef("tagebuch",eintragId))
     .then(function(){ if(onDone) onDone(); })
-    .catch(function(err){ toast("Loeschen fehlgeschlagen."); console.error(err); if(onDone) onDone(); });
+    .catch(function(err){ toast("Löschen fehlgeschlagen."); console.error(err); if(onDone) onDone(); });
 }
 
 // Einstellungen speichern
@@ -497,7 +497,7 @@ function renderLoginForm(){
     clear(statusDiv);
     signInWithPopup(auth, googleProvider)
       .then(function(result){
-        // onAuthStateChanged kuemmert sich um den Rest
+        // onAuthStateChanged kümmert sich um den Rest
       })
       .catch(function(err){
         btn.disabled=false;
@@ -530,7 +530,7 @@ function showLocationWizard(){
     el("div",{"class":"wizard-step active"})
   ]));
   content.appendChild(el("h2",null,"Dein Standort"));
-  content.appendChild(el("p",null,"Fuer Wetterdaten und Frostwarnungen benoetigen wir deinen Standort."));
+  content.appendChild(el("p",null,"Für Wetterdaten und Frostwarnungen benötigen wir deinen Standort."));
   var statusDiv=el("div");
   content.appendChild(statusDiv);
 
@@ -539,7 +539,7 @@ function showLocationWizard(){
   gpsBtn.addEventListener("click",function(){
     if(!navigator.geolocation){
       clear(statusDiv);
-      statusDiv.appendChild(el("div",{"class":"banner-warn"},"GPS nicht verfuegbar. Bitte Ort manuell eingeben."));
+      statusDiv.appendChild(el("div",{"class":"banner-warn"},"GPS nicht verfügbar. Bitte Ort manuell eingeben."));
       return;
     }
     gpsBtn.disabled=true;gpsBtn.textContent="Ermittle Standort...";
@@ -564,8 +564,8 @@ function showLocationWizard(){
   });
 
   // Option 2: Manuelle Eingabe
-  var manualInput=el("input",{"class":"auth-input",type:"text",placeholder:"z. B. Muenchen oder Graz",autocomplete:"off",style:"margin-top:var(--s-3)"});
-  var manualBtn=el("button",{"class":"auth-btn"},"Ort bestaetigen");
+  var manualInput=el("input",{"class":"auth-input",type:"text",placeholder:"z. B. München oder Graz",autocomplete:"off",style:"margin-top:var(--s-3)"});
+  var manualBtn=el("button",{"class":"auth-btn"},"Ort bestätigen");
   manualBtn.addEventListener("click",function(){
     var ort=manualInput.value.trim();
     if(!ort){clear(statusDiv);statusDiv.appendChild(el("div",{"class":"banner-warn"},"Bitte einen Ort eingeben."));return;}
@@ -575,7 +575,7 @@ function showLocationWizard(){
       .then(function(r){return r.json();})
       .then(function(data){
         if(!data.results||!data.results.length){
-          manualBtn.disabled=false;manualBtn.textContent="Ort bestaetigen";
+          manualBtn.disabled=false;manualBtn.textContent="Ort bestätigen";
           clear(statusDiv);statusDiv.appendChild(el("div",{"class":"banner-warn"},"Ort nicht gefunden. Bitte anders schreiben."));
           return;
         }
@@ -585,13 +585,13 @@ function showLocationWizard(){
         finishWizard();
       })
       .catch(function(){
-        manualBtn.disabled=false;manualBtn.textContent="Ort bestaetigen";
-        clear(statusDiv);statusDiv.appendChild(el("div",{"class":"banner-warn"},"Netzwerkfehler. Bitte Verbindung pruefen oder spaeter versuchen."));
+        manualBtn.disabled=false;manualBtn.textContent="Ort bestätigen";
+        clear(statusDiv);statusDiv.appendChild(el("div",{"class":"banner-warn"},"Netzwerkfehler. Bitte Verbindung prüfen oder später versuchen."));
       });
   });
 
-  // Option 3: Ueberspringen
-  var skipBtn=el("button",{"class":"auth-btn auth-btn--secondary",style:"margin-top:var(--s-2)"},"Spaeter einrichten");
+  // Option 3: Überspringen
+  var skipBtn=el("button",{"class":"auth-btn auth-btn--secondary",style:"margin-top:var(--s-2)"},"Später einrichten");
   skipBtn.addEventListener("click",function(){state.wizardDone=true;finishWizard();});
 
   content.appendChild(el("div",{"class":"location-opts"},[gpsBtn]));
@@ -817,8 +817,8 @@ function renderHome(){
   v.appendChild(el("div",{"class":"section-title"},"Schnellzugriff"));
   var grid=el("div",{"class":"plant-grid"});
   grid.appendChild(navCard("Pflanzen",state.pflanzen.length+" angelegt","#/pflanzen"));
-  grid.appendChild(navCard("Beetkarte","L-Form, 7,5 m x 0,6 m","#/beetkarte"));
-  grid.appendChild(navCard("Tagebuch",state.tagebuch.length+" Eintraege","#/tagebuch"));
+  grid.appendChild(navCard("Beetkarte","L-Form","#/beetkarte"));
+  grid.appendChild(navCard("Tagebuch",state.tagebuch.length+" Einträge","#/tagebuch"));
   v.appendChild(grid);
 
   // Wetter asynchron laden
@@ -828,7 +828,7 @@ function renderHome(){
 
     clear(wetterCard);
     if (err || !data || !data.current) {
-      wetterCard.appendChild(el("div",{"class":"weather-card__loading"},"Wetterdaten nicht verfuegbar."));
+      wetterCard.appendChild(el("div",{"class":"weather-card__loading"},"Wetterdaten nicht verfügbar."));
       return;
     }
 
@@ -859,7 +859,7 @@ function renderHome(){
       var erstFrost = frost.tage[0];
       var warnText = "Frost am "+formatFrostDatum(erstFrost.datum)+" ("+erstFrost.min+"°C): "+pflanzenNamen+" schuetzen.";
       if (frost.tage.length > 1) {
-        warnText += " ("+frost.tage.length+" Frosttage in den naechsten 7 Tagen)";
+        warnText += " ("+frost.tage.length+" Frosttage in den nächsten 7 Tagen)";
       }
       hinweisBereich.appendChild(el("div",{"class":"section-title"},"Hinweise"));
       hinweisBereich.appendChild(el("div",{"class":"frost-banner"},[
@@ -872,7 +872,6 @@ function renderHome(){
 
 function navCard(name,meta,href){
   return el("a",{"class":"plant-card",href:href},[
-    el("div",{"class":"plant-card__emoji"},name.charAt(0)),
     el("div",{"class":"plant-card__body"},[el("div",{"class":"plant-card__name"},name),el("div",{"class":"plant-card__meta"},meta)]),
     el("span",{"class":"plant-card__chev"},">")
   ]);
@@ -883,7 +882,7 @@ function renderPflanzenListe(){
   var v=document.getElementById("view");clear(v);
   var searchInput=el("input",{type:"search",placeholder:"Pflanze suchen...",value:state.suchtext,autocomplete:"off",autocapitalize:"off",spellcheck:"false"});
   searchInput.addEventListener("input",function(e){state.suchtext=e.target.value;renderList();});
-  v.appendChild(el("div",{"class":"search"},[el("span",{"class":"search-ico"},"?"),searchInput]));
+  v.appendChild(el("div",{"class":"search"},[searchInput]));
   var listContainer=el("div",{"class":"plant-grid"});v.appendChild(listContainer);
   function renderList(){
     clear(listContainer);
@@ -908,10 +907,10 @@ function renderPflanzenListe(){
 function renderPflanzeDetail(id){
   var v=document.getElementById("view");clear(v);
   var p=null;for(var i=0;i<state.pflanzen.length;i++)if(state.pflanzen[i].id===id){p=state.pflanzen[i];break;}
-  if(!p){v.appendChild(el("div",{"class":"placeholder"},[el("h2",null,"Nicht gefunden"),el("a",{"class":"btn",href:"#/pflanzen"},"Zurueck")]));return;}
+  if(!p){v.appendChild(el("div",{"class":"placeholder"},[el("h2",null,"Nicht gefunden"),el("a",{"class":"btn",href:"#/pflanzen"},"Zurück")]));return;}
 
-  // Zurueck-Button
-  var backBtn = el("button",{"class":"btn btn--ghost",style:"margin-bottom:var(--s-3);"},"< Zurueck");
+  // Zurück-Button
+  var backBtn = el("button",{"class":"btn btn--ghost",style:"margin-bottom:var(--s-3);"},"< Zurück");
   backBtn.addEventListener("click", function(){ history.back(); });
   v.appendChild(backBtn);
 
@@ -925,7 +924,7 @@ function renderPflanzeDetail(id){
   v.appendChild(el("div",{"class":"section-title"},"Eigenschaften"));
   v.appendChild(el("div",{"class":"card"},[el("ul",{"class":"props"},[
     propLi("Kategorie",p.kategorie),propLi("Standort",p.standort),propLi("Wasserbedarf",p.wasserbedarf),
-    propLi("Wuchshoehe",p.wuchshoehe),propLi("Winterhart",p.winterhart===true?"Ja":p.winterhart===false?"Nein":null),
+    propLi("Wuchshöhe",p.wuchshoehe),propLi("Winterhart",p.winterhart===true?"Ja":p.winterhart===false?"Nein":null),
     propLi("Angelegt am",formatDatum(p.anlegedatum))
   ])]));
 
@@ -934,7 +933,7 @@ function renderPflanzeDetail(id){
     v.appendChild(el("div",{"class":"section-title"},"Zeiten"));
     v.appendChild(el("div",{"class":"card"},[el("ul",{"class":"props"},[
       zeitLi("Aussaat",p.aussaatzeit,p.aussaatzeit&&p.aussaatzeit.typ),
-      zeitLi("Pflanzung",p.pflanzzeit,null),zeitLi("Bluete",p.bluetezeit,null),zeitLi("Ernte",p.erntezeit,null)
+      zeitLi("Pflanzung",p.pflanzzeit,null),zeitLi("Blüte",p.bluetezeit,null),zeitLi("Ernte",p.erntezeit,null)
     ])]));
   }
 
@@ -945,13 +944,13 @@ function renderPflanzeDetail(id){
   // Frost
   if(p.frostHinweis){v.appendChild(el("div",{"class":"section-title"},"Frost"));v.appendChild(el("div",{"class":"card"},[el("div",{"class":"pflege-text"},p.frostHinweis)]));}
 
-  // Krankheiten & Schaedlinge
-  var hk=p.krankheiten&&p.krankheiten.length,hs=p.schaedlinge&&p.schaedlinge.length;
+  // Krankheiten & Schädlinge
+  var hk=p.krankheiten&&p.krankheiten.length,hs=p.schädlinge&&p.schädlinge.length;
   if(hk||hs){
-    v.appendChild(el("div",{"class":"section-title"},"Krankheiten & Schaedlinge"));
+    v.appendChild(el("div",{"class":"section-title"},"Krankheiten & Schädlinge"));
     var box=el("div",{"class":"card"});
     if(hk){var t1=el("div",{"class":"tags"});for(var k1=0;k1<p.krankheiten.length;k1++)t1.appendChild(el("span",{"class":"tag"},p.krankheiten[k1]));box.appendChild(el("div",{style:"margin-bottom:12px"},[el("div",{"class":"field-hint",style:"margin-bottom:6px"},"Krankheiten"),t1]));}
-    if(hs){var t2=el("div",{"class":"tags"});for(var k2=0;k2<p.schaedlinge.length;k2++)t2.appendChild(el("span",{"class":"tag"},p.schaedlinge[k2]));box.appendChild(el("div",null,[el("div",{"class":"field-hint",style:"margin-bottom:6px"},"Schaedlinge"),t2]));}
+    if(hs){var t2=el("div",{"class":"tags"});for(var k2=0;k2<p.schädlinge.length;k2++)t2.appendChild(el("span",{"class":"tag"},p.schädlinge[k2]));box.appendChild(el("div",null,[el("div",{"class":"field-hint",style:"margin-bottom:6px"},"Schädlinge"),t2]));}
     v.appendChild(box);
   }
 
@@ -961,38 +960,38 @@ function renderPflanzeDetail(id){
   renderBeetkarteMini(miniBox, p.id);
   v.appendChild(miniBox);
 
-  // ---- Tagebuch-Sektion (§4: Tagebuch – nur Eintraege dieser Pflanze) ----
+  // ---- Tagebuch-Sektion (§4: Tagebuch – nur Einträge dieser Pflanze) ----
   v.appendChild(el("div",{"class":"section-title"},"Tagebuch"));
-  var eintraege=state.tagebuch.filter(function(e){return e.pflanzeId===p.id;});
+  var einträge=state.tagebuch.filter(function(e){return e.pflanzeId===p.id;});
   // Absteigende Sortierung nach Datum (§14)
-  eintraege.sort(function(a,b){return a.datum<b.datum?1:a.datum>b.datum?-1:0;});
+  einträge.sort(function(a,b){return a.datum<b.datum?1:a.datum>b.datum?-1:0;});
 
   var tagebuchBox=el("div",{"class":"card"});
-  var addBtn=el("button",{"class":"btn btn--sm btn--ghost",style:"margin-bottom:var(--s-3);width:100%"},"+ Eintrag hinzufuegen");
+  var addBtn=el("button",{"class":"btn btn--sm btn--ghost",style:"margin-bottom:var(--s-3);width:100%"},"+ Eintrag hinzufügen");
   addBtn.addEventListener("click",function(){openTagebuchForm(p.id,p.name);});
   tagebuchBox.appendChild(addBtn);
 
-  if(eintraege.length===0){
-    tagebuchBox.appendChild(el("div",{style:"text-align:center;padding:var(--s-4);color:var(--c-ink-mute);font-size:14px"},"Noch keine Eintraege fuer diese Pflanze."));
+  if(einträge.length===0){
+    tagebuchBox.appendChild(el("div",{style:"text-align:center;padding:var(--s-4);color:var(--c-ink-mute);font-size:14px"},"Noch keine Einträge für diese Pflanze."));
   } else {
     var list=el("div");
-    for(var ei=0;ei<eintraege.length;ei++){
-      list.appendChild(renderTagebuchEintrag(eintraege[ei],tagebuchBox,list,p));
+    for(var ei=0;ei<einträge.length;ei++){
+      list.appendChild(renderTagebuchEintrag(einträge[ei],tagebuchBox,list,p));
     }
     tagebuchBox.appendChild(list);
   }
   v.appendChild(tagebuchBox);
 
   // Aktionen
-  var delFn=function(){confirmModal({title:"Pflanze loeschen?",text:"Beetpositionen werden entfernt. Tagebucheintraege bleiben erhalten.",confirmLabel:"Loeschen",danger:true,onConfirm:function(){
+  var delFn=function(){confirmModal({title:"Pflanze löschen?",text:"Beetpositionen werden entfernt. Tagebucheinträge bleiben erhalten.",confirmLabel:"Löschen",danger:true,onConfirm:function(){
     var pid=p.id;
     state.pflanzen=state.pflanzen.filter(function(x){return x.id!==pid;});
     state.beetpositionen=state.beetpositionen.filter(function(b){return b.pflanzeId!==pid;});
-    fsDeletePflanze(pid,function(){ toast("Pflanze geloescht"); location.hash="#/pflanzen"; });
+    fsDeletePflanze(pid,function(){ toast("Pflanze gelöscht"); location.hash="#/pflanzen"; });
   }});};
   v.appendChild(el("div",{"class":"detail-actions"},[
     el("a",{"class":"btn btn--ghost",href:"#/pflanzen/"+p.id+"/bearbeiten",style:"flex:1"},"Bearbeiten"),
-    el("button",{"class":"btn btn--danger",style:"flex:1",onclick:delFn},"Loeschen")
+    el("button",{"class":"btn btn--danger",style:"flex:1",onclick:delFn},"Löschen")
   ]));
 }
 
@@ -1003,18 +1002,18 @@ function renderTagebuchEintrag(eintrag, containerToRefresh, listEl, pflanze){
   header.appendChild(el("span",{"class":"tagebuch-eintrag__datum"},formatDatum(eintrag.datum)));
   var actions=el("div",{"class":"tagebuch-eintrag__actions"});
   var editBtn=el("button",{"class":"link-btn"},"Bearbeiten");
-  var delBtn=el("button",{"class":"link-btn link-btn--danger"},"Loeschen");
+  var delBtn=el("button",{"class":"link-btn link-btn--danger"},"Löschen");
   editBtn.addEventListener("click",function(){
     var pflanzeId=pflanze?pflanze.id:null;
     var pflanzenName=pflanze?pflanze.name:null;
     openTagebuchForm(pflanzeId,pflanzenName,eintrag);
   });
   delBtn.addEventListener("click",function(){
-    confirmModal({title:"Eintrag loeschen?",confirmLabel:"Loeschen",danger:true,onConfirm:function(){
+    confirmModal({title:"Eintrag löschen?",confirmLabel:"Löschen",danger:true,onConfirm:function(){
       var delId=eintrag.id;
       state.tagebuch=state.tagebuch.filter(function(x){return x.id!==delId;});
       fsDeleteTagebuch(delId,function(){
-        toast("Eintrag geloescht");
+        toast("Eintrag gelöscht");
         if(pflanze)renderPflanzeDetail(pflanze.id);else renderTagebuchGesamt();
       });
     }});
@@ -1079,7 +1078,7 @@ function openTagebuchForm(pflanzeId, pflanzenName, eintrag){
   // Pflanzenzuordnung (read-only beim Bearbeiten, §7.1)
   var zuordnungDiv=null;
   if(draft.pflanzenName){
-    zuordnungDiv=el("div",{style:"font-size:13px;color:var(--c-ink-mute);margin-bottom:var(--s-2)"},"Pflanze: "+draft.pflanzenName+(isEdit?" (nicht aenderbar)":""));
+    zuordnungDiv=el("div",{style:"font-size:13px;color:var(--c-ink-mute);margin-bottom:var(--s-2)"},"Pflanze: "+draft.pflanzenName+(isEdit?" (nicht änderbar)":""));
   }
 
 
@@ -1126,17 +1125,17 @@ function openTagebuchForm(pflanzeId, pflanzenName, eintrag){
 // ---- Tagebuch Gesamt-Ansicht ----
 function renderTagebuchGesamt(){
   var v=document.getElementById("view");clear(v);
-  var eintraege=state.tagebuch.slice();
-  eintraege.sort(function(a,b){return a.datum<b.datum?1:a.datum>b.datum?-1:0;});
-  v.appendChild(el("div",{"class":"section-title"},"Alle Eintraege"));
-  if(eintraege.length===0){
-    v.appendChild(el("div",{"class":"empty card"},[el("h3",null,"Noch keine Eintraege"),el("p",null,"Tippe auf das Plus, um deinen ersten Garteneintrag anzulegen.")]));
+  var einträge=state.tagebuch.slice();
+  einträge.sort(function(a,b){return a.datum<b.datum?1:a.datum>b.datum?-1:0;});
+  v.appendChild(el("div",{"class":"section-title"},"Alle Einträge"));
+  if(einträge.length===0){
+    v.appendChild(el("div",{"class":"empty card"},[el("h3",null,"Noch keine Einträge"),el("p",null,"Tippe auf das Plus, um deinen ersten Garteneintrag anzulegen.")]));
     return;
   }
   var list=el("div",{"class":"card"});
-  for(var i=0;i<eintraege.length;i++){
-    var e=eintraege[i];
-    // Pflanze finden fuer den Kontext
+  for(var i=0;i<einträge.length;i++){
+    var e=einträge[i];
+    // Pflanze finden für den Kontext
     var pfl=null;if(e.pflanzeId){for(var j=0;j<state.pflanzen.length;j++)if(state.pflanzen[j].id===e.pflanzeId){pfl=state.pflanzen[j];break;}}
     var div=el("div",{"class":"tagebuch-eintrag"});
     var header=el("div",{"class":"tagebuch-eintrag__header"});
@@ -1144,14 +1143,14 @@ function renderTagebuchGesamt(){
     header.appendChild(el("span",{"class":"tagebuch-eintrag__datum"},datumPflanze));
     var actions=el("div",{"class":"tagebuch-eintrag__actions"});
     var editBtn=el("button",{"class":"link-btn"},"Bearbeiten");
-    var delBtn=el("button",{"class":"link-btn link-btn--danger"},"Loeschen");
+    var delBtn=el("button",{"class":"link-btn link-btn--danger"},"Löschen");
     (function(eintrag,pflanze){
       editBtn.addEventListener("click",function(){openTagebuchForm(eintrag.pflanzeId,eintrag.pflanzenName,eintrag);});
       delBtn.addEventListener("click",function(){
-        confirmModal({title:"Eintrag loeschen?",confirmLabel:"Loeschen",danger:true,onConfirm:function(){
+        confirmModal({title:"Eintrag löschen?",confirmLabel:"Löschen",danger:true,onConfirm:function(){
           var delId2=eintrag.id;
           state.tagebuch=state.tagebuch.filter(function(x){return x.id!==delId2;});
-          fsDeleteTagebuch(delId2,function(){ toast("Eintrag geloescht"); renderTagebuchGesamt(); });
+          fsDeleteTagebuch(delId2,function(){ toast("Eintrag gelöscht"); renderTagebuchGesamt(); });
         }});
       });
     })(e,pfl);
@@ -1185,7 +1184,7 @@ function renderEinstellungen(){
       document.getElementById("authScreen").style.display="flex";
       document.getElementById("app").style.display="none";
       showLocationWizard();
-    }},"Standort aendern")
+    }},"Standort ändern")
   ]));
 
   var logoutBtn=el("button",{"class":"btn btn--danger",style:"margin-top:var(--s-4);width:100%"},"Abmelden");
@@ -1203,25 +1202,25 @@ function renderPflanzeForm(id){
     id:uuid(),schemaVersion:1,anlegedatum:heute(),name:"",lateinisch:"",kategorie:null,emoji:"",
     wasserbedarf:null,standort:null,wuchshoehe:"",
     aussaatzeit:{von:"",bis:"",typ:null},pflanzzeit:{von:"",bis:""},bluetezeit:{von:"",bis:""},erntezeit:{von:"",bis:""},
-    winterhart:null,frostHinweis:"",krankheiten:[],schaedlinge:[],pflege:""
+    winterhart:null,frostHinweis:"",krankheiten:[],schädlinge:[],pflege:""
   };
   var form=el("form",{"class":"form"});form.addEventListener("submit",function(e){e.preventDefault();save();});
-  if(!isEdit){form.appendChild(el("div",{"class":"banner-warn"},[el("strong",null,"Auto-Befuellung kommt in Schritt 9.")]));}
+
   form.appendChild(field("Name *",inputBound(draft,"name",{autofocus:!isEdit})));
   form.appendChild(field("Lateinischer Name",inputBound(draft,"lateinisch")));
   form.appendChild(field("Emoji",inputBound(draft,"emoji",{maxlength:4})));
   form.appendChild(field("Kategorie",selectBound(draft,"kategorie",KATEGORIEN)));
   form.appendChild(field("Standort",selectBound(draft,"standort",STANDORTE)));
   form.appendChild(field("Wasserbedarf",selectBound(draft,"wasserbedarf",WASSERBEDARF)));
-  form.appendChild(field("Wuchshoehe",inputBound(draft,"wuchshoehe",{placeholder:"z. B. 150cm"})));
+  form.appendChild(field("Wuchshöhe",inputBound(draft,"wuchshoehe",{placeholder:"z. B. 150cm"})));
   form.appendChild(el("div",{"class":"field"},[el("label",null,"Winterhart"),tristate(draft,"winterhart")]));
   form.appendChild(field("Frosthinweis",textareaBound(draft,"frostHinweis")));
   form.appendChild(zeitFieldset("Aussaatzeit",draft,"aussaatzeit",true));
   form.appendChild(zeitFieldset("Pflanzzeit",draft,"pflanzzeit",false));
-  form.appendChild(zeitFieldset("Bluetezeit",draft,"bluetezeit",false));
+  form.appendChild(zeitFieldset("Blütezeit",draft,"bluetezeit",false));
   form.appendChild(zeitFieldset("Erntezeit",draft,"erntezeit",false));
   form.appendChild(field("Krankheiten",csvInputBound(draft,"krankheiten"),"Mehrere durch Komma trennen"));
-  form.appendChild(field("Schaedlinge",csvInputBound(draft,"schaedlinge"),"Mehrere durch Komma trennen"));
+  form.appendChild(field("Schädlinge",csvInputBound(draft,"schädlinge"),"Mehrere durch Komma trennen"));
   form.appendChild(field("Pflege",textareaBound(draft,"pflege",{rows:5})));
   var cancelBtn=el("button",{type:"button","class":"btn btn--ghost",style:"flex:1"},"Abbrechen");
   cancelBtn.addEventListener("click",function(){history.back();});
@@ -1298,7 +1297,7 @@ function legendeErstellen(numMap) {
     for (var j = 0; j < state.pflanzen.length; j++) if (state.pflanzen[j].id === bp.pflanzeId) { pfl = state.pflanzen[j]; break; }
     if (!pfl) continue; // Beetposition ohne gültige Pflanze überspringen
     var name = pfl.name;
-    if (!map[bp.pflanzeId]) map[bp.pflanzeId] = { name: name, nummern: [] };
+    if (!map[bp.pflanzeId]) map[bp.pflanzeId] = { name: name, nummern: [], pflanzeId: bp.pflanzeId };
     map[bp.pflanzeId].nummern.push(numMap[bp.id]);
   }
   var arr = [];
@@ -1306,6 +1305,28 @@ function legendeErstellen(numMap) {
   arr.sort(function(a,b){ return (a.name||"").localeCompare(b.name||"","de",{sensitivity:"base"}); });
   arr.forEach(function(e){ e.nummern.sort(function(a,b){return a-b;}); });
   return arr;
+}
+
+
+// Farbe für Beetmarker basierend auf pflanzeId
+var MARKER_FARBEN = [
+  "#3d5a3d", "#b8612a", "#4a7c9e", "#8b5e3c", "#6b4c8a",
+  "#2e7d6b", "#c17f24", "#a83232", "#4a6741", "#7a4f6d",
+  "#1a6b8a", "#c45c2a", "#5a7a3d", "#8a3d6b", "#3d7a6b",
+  "#a87832", "#6b3d8a", "#2e6b4a", "#8a6b3d", "#4a3d8a",
+  "#7a2e4a", "#3d6b8a", "#6b8a3d", "#8a4a2e", "#2e4a6b",
+  "#7a6b2e", "#4a8a6b", "#6b2e7a", "#8a2e3d", "#3d8a4a"
+];
+
+function markerFarbe(pflanzeId) {
+  // Konsistente Farbe basierend auf pflanzeId
+  var hash = 0;
+  for (var i = 0; i < pflanzeId.length; i++) {
+    hash = ((hash << 5) - hash) + pflanzeId.charCodeAt(i);
+    hash = hash & hash;
+  }
+  var idx = Math.abs(hash) % MARKER_FARBEN.length;
+  return MARKER_FARBEN[idx];
 }
 
 // SVG der Beetkarte erstellen
@@ -1411,9 +1432,13 @@ function beetSVG(svgW, moving, onTap, onMarkerLongpress, filterPflanzeId) {
       var g = document.createElementNS(svgNS, "g");
       g.setAttribute("class", "beet-marker" + (moving === bp.id ? " moving" : ""));
 
+      var mFarbe = (moving === bp.id) ? "#b8612a" : markerFarbe(bp.pflanzeId);
       var circle = document.createElementNS(svgNS, "circle");
       circle.setAttribute("cx", pos.x); circle.setAttribute("cy", pos.y);
       circle.setAttribute("r", "14");
+      circle.setAttribute("fill", mFarbe);
+      circle.setAttribute("stroke", "white");
+      circle.setAttribute("stroke-width", "2");
       g.appendChild(circle);
 
       var text = document.createElementNS(svgNS, "text");
@@ -1476,9 +1501,9 @@ function pflanzeWaehlen(onSelect) {
 
   var children = [el("h2", null, "Pflanze waehlen")];
   if (state.pflanzen.length === 0) {
-    children.push(el("p", {style:"color:var(--c-ink-mute);font-size:14px"}, "Du hast noch keine Pflanzen angelegt. Bitte erst eine Pflanze hinzufuegen."));
+    children.push(el("p", {style:"color:var(--c-ink-mute);font-size:14px"}, "Du hast noch keine Pflanzen angelegt. Bitte erst eine Pflanze hinzufügen."));
     children.push(el("div", {"class": "modal__actions"}, [
-      el("button", {"class": "btn btn--ghost", onclick: close}, "Schliessen")
+      el("button", {"class": "btn btn--ghost", onclick: close}, "Schließen")
     ]));
   } else {
     var sorted = state.pflanzen.slice().sort(function(a,b){return (a.name||"").localeCompare(b.name||"","de",{sensitivity:"base"});});
@@ -1518,7 +1543,7 @@ function drawBeetkarte(v) {
 
   // Hinweis wenn im Verschiebe-Modus
   if (beetState.moving) {
-    v.appendChild(el("div", {"class": "beet-hint"}, "Tippe auf die neue Position fuer den Marker."));
+    v.appendChild(el("div", {"class": "beet-hint"}, "Tippe auf die neue Position für den Marker."));
   }
 
   // SVG
@@ -1567,12 +1592,12 @@ function drawBeetkarte(v) {
           beetState.moving = bp.id;
           drawBeetkarte(v);
         }},
-        { label: "Loeschen", danger: true, onSelect: function() {
-          confirmModal({ title: "Position loeschen?", text: name + " Nr. " + num + " wird entfernt.", confirmLabel: "Loeschen", danger: true, onConfirm: function() {
+        { label: "Löschen", danger: true, onSelect: function() {
+          confirmModal({ title: "Position löschen?", text: name + " Nr. " + num + " wird entfernt.", confirmLabel: "Löschen", danger: true, onConfirm: function() {
             var delId = bp.id;
             state.beetpositionen = state.beetpositionen.filter(function(b){ return b.id !== delId; });
             fsDeleteBeetposition(delId, null);
-            toast("Position geloescht");
+            toast("Position gelöscht");
             drawBeetkarte(v);
           }});
         }}
@@ -1586,7 +1611,7 @@ function drawBeetkarte(v) {
 
   // Hinweis Tippen
   if (!beetState.moving) {
-    v.appendChild(el("div", {style:"font-size:12px;color:var(--c-ink-mute);text-align:center;margin-top:var(--s-2);"}, "Tippe auf das Beet um eine Pflanze zu platzieren. Langdruck auf Marker zum Verschieben oder Loeschen."));
+    v.appendChild(el("div", {style:"font-size:12px;color:var(--c-ink-mute);text-align:center;margin-top:var(--s-2);"}, "Tippe auf das Beet um eine Pflanze zu platzieren. Langdruck auf Marker zum Verschieben oder Löschen."));
   }
 
   // Legende
@@ -1597,8 +1622,12 @@ function drawBeetkarte(v) {
     var ul = el("ul", {"class": "legende"});
     for (var li = 0; li < legende.length; li++) {
       var entry = legende[li];
-      var dot = el("div", {"class": "legende__dot"}, [el("span", null, "")]);
-      var row = el("li", null, [
+      var lFarbe = markerFarbe(entry.pflanzeId);
+      var dot = el("div", {"class": "legende__dot", style: "background:" + lFarbe + ";"}, [el("span", null, "")]);
+      var row = el("a", {
+        href: "#/pflanzen/" + entry.pflanzeId,
+        style: "display:flex;align-items:center;gap:var(--s-2);padding:var(--s-2) 0;border-bottom:1px solid var(--c-line);text-decoration:none;color:inherit;font-size:14px;"
+      }, [
         dot,
         el("span", {"class": "legende__name"}, entry.name),
         el("span", {"class": "legende__nums"}, entry.nummern.join(", "))
