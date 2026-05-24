@@ -1090,7 +1090,7 @@ function openTagebuchForm(pflanzeId, pflanzenName, eintrag){
   scrim.addEventListener("click",function(e){if(e.target===scrim)close();});
   var modalChildren=[el("h2",null,isEdit?"Eintrag bearbeiten":"Neuer Eintrag")];
   if(zuordnungDiv)modalChildren.push(zuordnungDiv);
-  modalChildren.push(el("div",{"class":"field"},[el("label",null,"Datum"),datumInput]));
+  modalChildren.push(el("div",{"class":"field"},[el("label",null,"Datum"),el("div",{style:"overflow:hidden;width:100%;"},datumInput)]));
   modalChildren.push(el("div",{"class":"field"},[el("label",null,"Text"),textArea]));
   modalChildren.push(el("div",{"class":"modal__actions",style:"margin-top:var(--s-4)"},[cancelBtn,saveBtn]));
   scrim.appendChild(el("div",{"class":"modal"},modalChildren));
