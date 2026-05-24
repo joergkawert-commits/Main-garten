@@ -817,7 +817,7 @@ function renderHome(){
   v.appendChild(el("div",{"class":"section-title"},"Schnellzugriff"));
   var grid=el("div",{"class":"plant-grid"});
   grid.appendChild(navCard("Pflanzen",state.pflanzen.length+" angelegt","#/pflanzen"));
-  grid.appendChild(navCard("Beetkarte","L-Form","#/beetkarte"));
+  grid.appendChild(navCard("Beetkarte","","#/beetkarte"));
   grid.appendChild(navCard("Tagebuch",state.tagebuch.length+" Einträge","#/tagebuch"));
   v.appendChild(grid);
 
@@ -1265,7 +1265,7 @@ var BEET_W_M = 7.5;   // Breite Bounding-Box in Metern
 var BEET_H_M = 1.6;   // Höhe Bounding-Box (0.6 + 1.0)
 // Darstellung: nicht maßstäblich, aber lesbar auf Bildschirm
 // Langer Schenkel nimmt 35% der Höhe ein, kurzer Schenkel 20% der Breite
-var BEET_LANG_H = 0.35;   // visueller Anteil langer Schenkel an Gesamthöhe
+var BEET_LANG_H = 0.50;   // beide Schenkel gleich dick (nicht maßstäblich)
 var BEET_KURZ_W = 0.20;   // visueller Anteil kurzer Schenkel an Gesamtbreite
 
 // Prüfe ob ein relativer Punkt (rx, ry) im L-Polygon liegt
