@@ -17,7 +17,6 @@
     --c-ink-mute:#8a8e83; --c-line:#e5e0d2; --c-line-strong:#cfc8b3;
     --c-leaf:#3d5a3d; --c-danger:#a83232;
     --c-warn-bg:#fff4dc; --c-warn-bd:#e6c577; --c-warn-ink:#6b4a14;
-    --c-success-bg:#edf7ed; --c-success-bd:#7fbf7f; --c-success-ink:#1e4d1e;
     --r-md:12px; --r-lg:16px;
     --s-1:4px;--s-2:8px;--s-3:12px;--s-4:16px;--s-5:24px;--s-6:32px;--s-7:48px;
     --shadow-sm:0 1px 0 rgba(31,36,29,0.04),0 1px 2px rgba(31,36,29,0.06);
@@ -34,9 +33,6 @@
   button{font-family:inherit;font-size:inherit;cursor:pointer;}
   input,textarea,select{font-family:inherit;font-size:16px;}
 
-  #errorBanner{display:none;position:fixed;top:0;left:0;right:0;background:#a83232;color:white;padding:12px 16px;padding-top:calc(env(safe-area-inset-top,0px) + 12px);font-size:13px;font-family:monospace;z-index:999;max-height:50vh;overflow-y:auto;}
-  #errorBanner.visible{display:block;}
-  #errorBanner button{float:right;background:white;color:#a83232;border:none;padding:4px 10px;border-radius:4px;margin-left:8px;font-weight:bold;}
 
   /* Auth-Screen */
   #authScreen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--s-5);padding-top:calc(var(--safe-top) + var(--s-5));background:var(--c-bg);}
@@ -51,20 +47,9 @@
   .auth-btn{width:100%;padding:14px;border-radius:var(--r-md);border:none;background:var(--c-leaf);color:white;font-weight:600;font-size:16px;cursor:pointer;}
   .auth-btn:active{transform:scale(0.98);}
   .auth-btn:disabled{opacity:0.6;cursor:default;}
-  .auth-btn--secondary{background:transparent;color:var(--c-leaf);border:1px solid var(--c-leaf);margin-top:var(--s-2);}
-  .auth-hint{font-size:13px;color:var(--c-ink-mute);text-align:center;margin-top:var(--s-3);}
 
-  /* Wizard-Steps */
-  .wizard-steps{display:flex;gap:var(--s-2);margin-bottom:var(--s-5);}
-  .wizard-step{flex:1;height:4px;border-radius:2px;background:var(--c-line);}
-  .wizard-step.done{background:var(--c-leaf);}
-  .wizard-step.active{background:var(--c-leaf-soft,#6b8a6b);}
+  
 
-  .location-opts{display:flex;flex-direction:column;gap:var(--s-2);margin-bottom:var(--s-3);}
-  .location-opt{padding:14px;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:var(--c-bg-card);color:var(--c-ink);text-align:left;font-size:15px;}
-  .location-opt:active{background:var(--c-line);}
-
-  .banner-success{background:var(--c-success-bg);border:1px solid var(--c-success-bd);color:var(--c-success-ink);padding:var(--s-3) var(--s-4);border-radius:var(--r-md);font-size:14px;margin-bottom:var(--s-3);}
   .banner-warn{background:var(--c-warn-bg);border:1px solid var(--c-warn-bd);color:var(--c-warn-ink);padding:var(--s-3) var(--s-4);border-radius:var(--r-md);font-size:14px;margin-bottom:var(--s-3);}
 
   .spinner{width:24px;height:24px;border:3px solid var(--c-line);border-top-color:var(--c-leaf);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto var(--s-3);}
@@ -92,7 +77,6 @@
   .drawer__item{display:flex;align-items:center;gap:var(--s-3);padding:var(--s-3) var(--s-5);color:var(--c-ink);text-decoration:none;background:transparent;border:none;width:100%;text-align:left;font-size:16px;font-weight:500;}
   .drawer__item:active{background:var(--c-line);}
   .drawer__item.active{color:var(--c-leaf);background:rgba(61,90,61,0.07);border-left:3px solid var(--c-leaf);padding-left:calc(var(--s-5) - 3px);}
-  .drawer__item .ico{font-size:20px;width:22px;text-align:center;}
   .drawer__item--danger{color:var(--c-danger);}
 
   /* Cards / Sections */
@@ -103,13 +87,11 @@
   .hero{margin-top:var(--s-2);}
   .hero__greeting{font-family:var(--font-display);font-size:28px;line-height:1.15;margin-bottom:var(--s-1);}
   .hero__date{color:var(--c-ink-mute);font-size:14px;}
-  .weather-card__placeholder{font-size:13px;color:var(--c-ink-mute);font-style:italic;}
 
   /* Plant list */
   .search{position:relative;margin-bottom:var(--s-3);}
   .search input{width:100%;padding:var(--s-3) var(--s-3) var(--s-3) 40px;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:var(--c-bg-card);color:var(--c-ink);outline:none;}
   .search input:focus{border-color:var(--c-leaf);}
-  .search .search-ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--c-ink-mute);pointer-events:none;}
   .plant-grid{display:grid;gap:var(--s-3);}
   .plant-card{background:var(--c-bg-card);border:1px solid var(--c-line);border-radius:var(--r-lg);padding:var(--s-3) var(--s-4);display:flex;align-items:center;gap:var(--s-3);text-decoration:none;color:inherit;}
   .plant-card:active{transform:scale(0.99);}
@@ -199,7 +181,6 @@
   /* Beetkarte */
   .beet-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
   .beet-svg{display:block;touch-action:none;cursor:crosshair;}
-  .beet-rect{fill:#e8f0e8;stroke:#3d5a3d;stroke-width:2;}
   .beet-marker{cursor:pointer;}
   .beet-marker circle{stroke:white;stroke-width:2;}
   .beet-marker.moving circle{fill:#b8612a;stroke:white;stroke-width:2;}
@@ -235,15 +216,11 @@
 </head>
 <body>
 
-<div id="errorBanner">
-  <button onclick="document.getElementById('errorBanner').classList.remove('visible')">X</button>
-  <strong>Fehler:</strong> <span id="errorText"></span>
-</div>
 
 <div id="authScreen">
   <div class="auth-card">
     <div class="auth-logo">Mein Garten</div>
-    <div class="auth-tagline">Dein persoenliches Gartentagebuch</div>
+    <div class="auth-tagline">Dein persönliches Gartentagebuch</div>
     <div id="authContent"><div class="spinner"></div></div>
   </div>
 </div>
@@ -275,27 +252,7 @@ import{initializeFirestore,persistentLocalCache,persistentSingleTabManager,colle
 
 "use strict";
 
-function statusLog(msg) {
-  var c = document.getElementById("authContent");
-  if (!c) return;
-  var d = document.createElement("div");
-  d.style.cssText = "font-size:11px;color:#666;text-align:center;margin-top:4px;";
-  d.textContent = msg;
-  c.appendChild(d);
-}
-window.onerror = function(msg,src,line){
-  var b=document.getElementById("errorBanner"),t=document.getElementById("errorText");
-  if(b&&t){t.textContent=msg+" Zeile:"+line;b.classList.add("visible");}
-  statusLog("FEHLER: "+msg);
-  return false;
-};
-window.addEventListener("unhandledrejection",function(e){
-  var r=e&&e.reason,msg=r&&r.message?r.message:String(r||"?");
-  var b=document.getElementById("errorBanner"),t=document.getElementById("errorText");
-  if(b&&t){t.textContent="Promise: "+msg;b.classList.add("visible");}
-  statusLog("PROMISE-FEHLER: "+msg);
-});
-statusLog("1/4 Script gestartet");
+
 
 const firebaseConfig={
   apiKey:"AIzaSyA_Kcp1DAuM91UvHuqca8LzFgdZ9AJvNG4",
@@ -360,7 +317,6 @@ var MONATE=["Januar","Februar","März","April","Mai","Juni","Juli","August","Sep
 // ---- State ----
 var state={
   user:null,
-  wizardDone:false,   // true sobald Standort-Wizard abgeschlossen
   pflanzen:[],
   beetpositionen:[],
   tagebuch:[],
@@ -369,7 +325,7 @@ var state={
 };
 
 // ================================================================
-// FIRESTORE CRUD (Schritt 6)
+// FIRESTORE CRUD
 // ================================================================
 
 // Hilfsfunktion: null-Werte aus Objekt entfernen für Firestore
@@ -396,7 +352,6 @@ function docRef(name,id) { return doc(db,"users",state.user.uid,name,id); }
 // Alle Daten laden
 function ladeAlleDaten(onDone) {
   var uid = state.user.uid;
-  statusLog("Lade Daten aus Firestore...");
   var promises = [
     getDocs(collection(db,"users",uid,"pflanzen")),
     getDocs(collection(db,"users",uid,"beetpositionen")),
@@ -417,10 +372,8 @@ function ladeAlleDaten(onDone) {
       var eData = einstellDoc.data();
       if (eData.standort) state.einstellungen.standort = eData.standort;
     }
-    statusLog("Daten geladen: "+state.pflanzen.length+" Pflanzen");
     onDone();
   }).catch(function(err) {
-    statusLog("Ladefehler: "+(err&&err.message?err.message:String(err)));
     toast("Fehler beim Laden. Bitte neu laden.");
     onDone(); // trotzdem starten mit leeren Daten
   });
@@ -517,18 +470,11 @@ function renderLoginForm(){
   content.appendChild(el("div",{"class":"auth-hint"},"Nur du hast Zugang zu deinen Pflanzendaten."));
 }
 
-
-
-// ---- Standort-Wizard (Schritt 2 des Setup-Wizards) ----
+// ---- Standort-Wizard ----
 // Wird einmalig nach dem ersten Login angezeigt.
-// "Einmalig" = solange wizardDone false ist. In Schritt 6 wird das in Firestore persistiert.
 function showLocationWizard(){
   var content=document.getElementById("authContent");clear(content);
-  // Progress-Indicator: 2 Schritte, wir sind bei Schritt 2
-  content.appendChild(el("div",{"class":"wizard-steps"},[
-    el("div",{"class":"wizard-step done"}),
-    el("div",{"class":"wizard-step active"})
-  ]));
+
   content.appendChild(el("h2",null,"Dein Standort"));
   content.appendChild(el("p",null,"Für Wetterdaten und Frostwarnungen benötigen wir deinen Standort."));
   var statusDiv=el("div");
@@ -546,11 +492,8 @@ function showLocationWizard(){
     navigator.geolocation.getCurrentPosition(
       function(pos){
         state.einstellungen.standort={lat:pos.coords.latitude,lon:pos.coords.longitude,name:"Mein Standort"};
-        // Ortsname per Reverse-Geocoding via Open-Meteo (kommt in Schritt 7 vollstaendig)
-        // Vorerst: Koordinaten als Name
         state.einstellungen.standort.name=pos.coords.latitude.toFixed(2)+"N, "+pos.coords.longitude.toFixed(2)+"E";
-        state.wizardDone=true;
-        finishWizard();
+            finishWizard();
       },
       function(err){
         gpsBtn.disabled=false;gpsBtn.textContent="Standort automatisch ermitteln (GPS)";
@@ -581,8 +524,7 @@ function showLocationWizard(){
         }
         var r=data.results[0];
         state.einstellungen.standort={lat:r.latitude,lon:r.longitude,name:r.name+(r.country?" ("+r.country+")":"")};
-        state.wizardDone=true;
-        finishWizard();
+            finishWizard();
       })
       .catch(function(){
         manualBtn.disabled=false;manualBtn.textContent="Ort bestätigen";
@@ -591,10 +533,10 @@ function showLocationWizard(){
   });
 
   // Option 3: Überspringen
-  var skipBtn=el("button",{"class":"auth-btn auth-btn--secondary",style:"margin-top:var(--s-2)"},"Später einrichten");
-  skipBtn.addEventListener("click",function(){state.wizardDone=true;finishWizard();});
+  var skipBtn=el("button",{"class":"auth-btn",style:"margin-top:var(--s-2);background:transparent;color:var(--c-leaf);border:1px solid var(--c-leaf);"},"Später einrichten");
+  skipBtn.addEventListener("click",function(){finishWizard();});
 
-  content.appendChild(el("div",{"class":"location-opts"},[gpsBtn]));
+  content.appendChild(el("div",{style:"display:flex;flex-direction:column;gap:8px;margin-bottom:12px;"},[gpsBtn]));
   content.appendChild(manualInput);
   content.appendChild(manualBtn);
   content.appendChild(skipBtn);
@@ -614,11 +556,9 @@ function finishWizard(){
 }
 
 // ---- Auth State ----
-statusLog("2/4 Warte auf Auth...");
 onAuthStateChanged(auth,function(user){
   if(user){
-    statusLog("3/4 User: "+user.email);
-    // Zugriffskontrolle: nur autorisierte E-Mail
+      // Zugriffskontrolle: nur autorisierte E-Mail
     var ERLAUBTE_EMAIL = "joerg.kawert@icloud.com";
     if ((user.email||"").toLowerCase() !== ERLAUBTE_EMAIL.toLowerCase()) {
       signOut(auth);
@@ -631,20 +571,16 @@ onAuthStateChanged(auth,function(user){
       return;
     }
     state.user=user;
-    state.wizardDone=true;
     var email=user.email||"";
     document.getElementById("topbarUser").textContent=email;
     document.getElementById("drawerUser").textContent=email;
-    statusLog("4/4 Lade Firestore-Daten...");
-    ladeAlleDaten(function(){
+      ladeAlleDaten(function(){
       document.getElementById("authScreen").style.display="none";
       document.getElementById("app").style.display="flex";
       buildDrawer();
       route();
-      statusLog("FERTIG");
     });
   } else {
-    statusLog("Kein User - Login");
     state.user=null;
     showAuthScreen();
   }
@@ -709,7 +645,7 @@ function buildDrawer(){
   nav.appendChild(el("div",{style:"height:1px;background:var(--c-line);margin:8px 0"}));
   var logoutBtn=el("button",{"class":"drawer__item drawer__item--danger"},[el("span",null,"Abmelden")]);
   logoutBtn.addEventListener("click",function(){
-    confirmModal({title:"Abmelden?",text:"Du wirst ausgeloggt.",confirmLabel:"Abmelden",danger:true,onConfirm:function(){signOut(auth).then(function(){state.user=null;state.pflanzen=[];state.tagebuch=[];state.wizardDone=false;});}});
+    confirmModal({title:"Abmelden?",text:"Du wirst ausgeloggt.",confirmLabel:"Abmelden",danger:true,onConfirm:function(){signOut(auth).then(function(){state.user=null;state.pflanzen=[];state.tagebuch=[];});}});
   });
   nav.appendChild(logoutBtn);
 }
@@ -721,9 +657,8 @@ document.getElementById("scrim").addEventListener("click",closeDrawer);
 // VIEWS
 // ================================================================
 
-
 // ================================================================
-// WETTER + FROSTWARNUNG (Schritte 7+8)
+// WETTER + FROSTWARNUNG
 // ================================================================
 
 var wetterCache = { data: null, timestamp: 0 };
@@ -1081,8 +1016,6 @@ function openTagebuchForm(pflanzeId, pflanzenName, eintrag){
     zuordnungDiv=el("div",{style:"font-size:13px;color:var(--c-ink-mute);margin-bottom:var(--s-2)"},"Pflanze: "+draft.pflanzenName+(isEdit?" (nicht änderbar)":""));
   }
 
-
-
   var saveBtn=el("button",{"class":"btn",style:"flex:1"},isEdit?"Speichern":"Anlegen");
   saveBtn.addEventListener("click",function(){
     if(!draft.text.trim()){toast("Bitte einen Text eingeben.");return;}
@@ -1180,8 +1113,7 @@ function renderEinstellungen(){
       propLi("Koordinaten",standort.lat.toFixed(4)+" N, "+standort.lon.toFixed(4)+" E")
     ]),
     el("button",{"class":"btn btn--ghost btn--sm",style:"margin-top:var(--s-3);width:100%",onclick:function(){
-      state.wizardDone=false;
-      document.getElementById("authScreen").style.display="flex";
+        document.getElementById("authScreen").style.display="flex";
       document.getElementById("app").style.display="none";
       showLocationWizard();
     }},"Standort ändern")
@@ -1253,7 +1185,7 @@ function propLi(k,v){var hw=v!=null&&v!=="";return el("li",null,[el("span",{"cla
 function zeitLi(label,zeit,typ){if(!zeit||(!zeit.von&&!zeit.bis))return propLi(label,null);var von=zeit.von&&zeit.von!==""?zeit.von:null,bis=zeit.bis&&zeit.bis!==""?zeit.bis:null,text="";if(von&&bis&&von!==bis)text=von+" - "+bis;else if(von)text=von;else if(bis)text=bis;if(typ)text+=" ("+typ+")";return propLi(label,text||null);}
 
 // ================================================================
-// BEETKARTE (Schritt 4)
+// BEETKARTE
 // ================================================================
 
 // §5.1: L-Form: langer Schenkel 7.5m x 0.6m, kurzer Schenkel 1.0m x 0.6m (links unten)
@@ -1307,7 +1239,6 @@ function legendeErstellen(numMap) {
   return arr;
 }
 
-
 // Farbe für Beetmarker basierend auf pflanzeId
 var MARKER_FARBEN = [
   "#3d5a3d", "#b8612a", "#4a7c9e", "#8b5e3c", "#6b4c8a",
@@ -1350,7 +1281,7 @@ function beetSVG(svgW, moving, onTap, onMarkerLongpress, filterPflanzeId) {
   function svgToRel(sx, sy) { return { rx: (sx-pad) / (svgW-pad*2), ry: (sy-pad) / svgH }; }
 
   // L-Form mit SVG clipPath - sauberste Lösung ohne Innenlinien
-  // Schritt 1: clipPath definieren (L-Form)
+  // clipPath definieren (L-Form)
   var clipId = "beet-clip-"+Math.floor(Math.random()*99999);
   var defs = document.createElementNS(svgNS, "defs");
   var cp = document.createElementNS(svgNS, "clipPath");
@@ -1365,7 +1296,6 @@ function beetSVG(svgW, moving, onTap, onMarkerLongpress, filterPflanzeId) {
   defs.appendChild(cp);
   svg.appendChild(defs);
 
-  // Schritt 2: Hintergrund-Rechteck mit clipPath = nur L-Form wird gefüllt
   var bg = document.createElementNS(svgNS, "rect");
   bg.setAttribute("x","0"); bg.setAttribute("y","0");
   bg.setAttribute("width", svgW); bg.setAttribute("height", svgH);
@@ -1373,7 +1303,6 @@ function beetSVG(svgW, moving, onTap, onMarkerLongpress, filterPflanzeId) {
   bg.setAttribute("clip-path","url(#"+clipId+")");
   svg.appendChild(bg);
 
-  // Schritt 3: Außenlinie als einzelner geschlossener Pfad
   var lp2 = cpPts;
   var pathD = "M"+lp2[0].x+","+lp2[0].y
     +" L"+lp2[1].x+","+lp2[1].y
@@ -1661,9 +1590,7 @@ function renderBeetkarteMini(container, pflanzeId) {
   container.appendChild(el("div", {style:"font-size:12px;color:var(--c-ink-mute);margin-top:var(--s-2);"}, "Position" + (nums.length > 1 ? "en" : "") + ": " + nums.join(", ")));
 }
 
-
 function renderPlaceholder(titel,hinweis){var v=document.getElementById("view");clear(v);v.appendChild(el("div",{"class":"placeholder card"},[el("h2",null,titel),el("p",null,hinweis),el("a",{"class":"btn btn--ghost",href:"#/",style:"margin-top:16px"},"Zur Startseite")]));}
-
 
 // Service Worker registrieren
 if ("serviceWorker" in navigator) {
