@@ -1522,10 +1522,10 @@ function renderPflanzeForm(id){
     for(var i=0;i<keys.length;i++){var z=draft[keys[i]];if(z&&!z.von&&!z.bis&&!z.typ)draft[keys[i]]=null;}
     if(isEdit){
       for(var j=0;j<state.pflanzen.length;j++) if(state.pflanzen[j].id===id){state.pflanzen[j]=draft;break;}
-      fsSetPflanze(draft,function(){ toast("Gespeichert"); location.hash="#/pflanzen/"+draft.id; });
+      fsSetPflanze(draft,function(){ toast("Gespeichert"); location.hash="#/pflanzen"; });
     } else {
       state.pflanzen.push(draft);
-      fsSetPflanze(draft,function(){ toast("Pflanze angelegt"); location.hash="#/pflanzen/"+draft.id; });
+      fsSetPflanze(draft,function(){ toast("Pflanze angelegt"); location.hash="#/pflanzen"; });
     }
   }
 }
