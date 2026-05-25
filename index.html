@@ -1558,13 +1558,9 @@ var BEET_H_M = 1.6;   // Höhe Bounding-Box (0.6 + 1.0)
 var BEET_LANG_H = 0.50;   // beide Schenkel gleich dick (nicht maßstäblich)
 var BEET_KURZ_W = 0.20;   // visueller Anteil kurzer Schenkel an Gesamtbreite
 
-// Prüfe ob ein relativer Punkt (rx, ry) im L-Polygon liegt
+// Gesamtes Rechteck ist bepflanzbar, L ist nur Orientierung
 function punktImBeet(rx, ry) {
-  // Langer Schenkel: rx in [0,1], ry in [0, BEET_LANG_H]
-  if (ry >= 0 && ry <= BEET_LANG_H && rx >= 0 && rx <= 1) return true;
-  // Kurzer Schenkel: rx in [0, BEET_KURZ_W], ry in [BEET_LANG_H, 1]
-  if (ry > BEET_LANG_H && ry <= 1 && rx >= 0 && rx <= BEET_KURZ_W) return true;
-  return false;
+  return rx >= 0 && rx <= 1 && ry >= 0 && ry <= 1;
 }
 
 // Nummerierung: aufsteigend nach anlegedatum (§14)
